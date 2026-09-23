@@ -674,7 +674,7 @@ function adminPanel() {
     new ButtonBuilder().setCustomId('admin:dictlist').setLabel('辞書一覧').setEmoji('📚').setStyle(ButtonStyle.Secondary)
   );
   const row2 = new ActionRowBuilder().addComponents(
-    new ButtonBuilder().setCustomId('admin:reinstall').setLabel('このチャンネルに操作パネルを再設置').setEmoji('📌').setStyle(ButtonStyle.Success)
+    new ButtonBuilder().setCustomId('admin:movepanel').setLabel('設定パネルを移動').setEmoji('📌').setStyle(ButtonStyle.Success)
   );
   return { embeds: [embed], components: [row1, row2] };
 }
@@ -832,32 +832,9 @@ function settingsLauncherPayload() {
 }
 
 async function ensureSettingsLauncher(guild) {
-  const g = guildSettings(guild.id);
-  if (!g.source_channel_id) return null;
-
-  const channel = await guild.channels.fetch(g.source_channel_id).catch(() => null);
-  if (!channel || !canSend(channel)) return null;
-
-  if (g.settings_launcher_channel_id && g.settings_launcher_message_id) {
-    const oldChannel = await guild.channels.fetch(g.settings_launcher_channel_id).catch(() => null);
-    if (oldChannel) {
-      const oldMessage = await oldChannel.messages.fetch(g.settings_launcher_message_id).catch(() => null);
-      if (oldMessage) {
-        if (oldChannel.id === channel.id) {
-          await oldMessage.edit(settingsLauncherPayload()).catch(() => {});
-          return oldMessage;
-        }
-        await oldMessage.delete().catch(() => {});
-      }
-    }
-  }
-
-  const msg = await channel.send(settingsLauncherPayload());
-  patchGuild(guild.id, {
-    settings_launcher_channel_id: channel.id,
-    settings_launcher_message_id: msg.id
-  });
-  return msg;
+  // 個人設定ボタンはメイン設定パネルに常設する。
+  // 読み上げ対象チャンネルには設定メッセージを投稿しない。
+  return null;
 }
 
 async function showLibrary(interaction, query, favoritesOnly, edit) {
@@ -927,7 +904,7 @@ client.on(Events.GuildCreate, async guild => {
 
 const channelSessions = new Map();
 
-async function createChannelSession(interaction) {
+async function createChannelSession(interaction, purpose) {
   const fetched = await interaction.guild.channels.fetch();
   const channels = Array.from(fetched.values())
     .filter(Boolean)
@@ -952,7 +929,7 @@ async function createChannelSession(interaction) {
     }));
 
   const id = crypto.randomBytes(4).toString('hex');
-  const session = { id, guildId: interaction.guildId, userId: interaction.user.id, channels, page: 0, createdAt: Date.now() };
+  const session = { id, guildId: interaction.guildId, userId: interaction.user.id, channels, page: 0, purpose: purpose || 'source', createdAt: Date.now() };
   channelSessions.set(id, session);
   return session;
 }
@@ -988,7 +965,7 @@ function channelPickerPayload(session) {
   );
 
   return {
-    content: '📖 **読み上げ対象チャンネルを選択**\n全 ' + session.channels.length + ' 件 / ' + (session.page + 1) + ' / ' + pages + ' ページ',
+    content: (session.purpose === 'panel' ? '📌 **設定パネルの移動先を選択**' : '📖 **読み上げ対象チャンネルを選択**') + '\n全 ' + session.channels.length + ' 件 / ' + (session.page + 1) + ' / ' + pages + ' ページ',
     components: [row1, row2]
   };
 }
@@ -1044,9 +1021,38 @@ client.on(Events.InteractionCreate, async interaction => {
         const found = session.channels.find(ch => ch.id === selected);
         if (!found) return interaction.reply({ content: 'チャンネルを選択できませんでした。', ephemeral: true });
 
+        if (session.purpose === 'panel') {
+          const target = await interaction.guild.channels.fetch(found.id).catch(() => null);
+          if (!target || !canSend(target)) {
+            return interaction.update({ content: '⚠️ そのチャンネルにはBOTが投稿できません。', components: [] });
+          }
+
+          const g = guildSettings(interaction.guildId);
+          const oldChannelId = g.panel_channel_id;
+          const oldMessageId = g.panel_message_id;
+
+          const newMessage = await target.send(controlPanel(interaction.guildId));
+          patchGuild(interaction.guildId, {
+            panel_channel_id: target.id,
+            panel_message_id: newMessage.id
+          });
+
+          if (oldChannelId && oldMessageId) {
+            const oldChannel = await interaction.guild.channels.fetch(oldChannelId).catch(() => null);
+            if (oldChannel) {
+              const oldMessage = await oldChannel.messages.fetch(oldMessageId).catch(() => null);
+              if (oldMessage && oldMessage.id !== newMessage.id) await oldMessage.delete().catch(() => {});
+            }
+          }
+
+          return interaction.update({
+            content: '✅ 設定パネルを <#' + target.id + '> に移動しました。',
+            components: []
+          });
+        }
+
         patchGuild(interaction.guildId, { source_channel_id: found.id });
         await refreshPanel(interaction.guild);
-        await ensureSettingsLauncher(interaction.guild);
         return interaction.update({
           content: '✅ 読み上げ対象を <#' + found.id + '> に変更しました。',
           components: []
@@ -1157,7 +1163,7 @@ client.on(Events.InteractionCreate, async interaction => {
         if (!isAdmin(interaction)) {
           return interaction.reply({ content: '読み上げ対象チャンネルの変更は管理者のみ可能です。', ephemeral: true });
         }
-        const session = await createChannelSession(interaction);
+        const session = await createChannelSession(interaction, 'source');
         return interaction.reply(Object.assign({}, channelPickerPayload(session), { ephemeral: true }));
       }
       else if (action === 'speeddown' || action === 'speedup') {
@@ -1197,9 +1203,9 @@ client.on(Events.InteractionCreate, async interaction => {
         return interaction.reply({ content: '📚 **読み上げ辞書**\n' + txt, ephemeral: true });
       }
 
-      if (action === 'reinstall') {
-        const msg = await installPanel(interaction.guild, interaction.channel);
-        return interaction.reply({ content: msg ? '✅ このチャンネルに操作パネルを設置しました。' : '設置できませんでした。', ephemeral: true });
+      if (action === 'movepanel') {
+        const session = await createChannelSession(interaction, 'panel');
+        return interaction.reply(Object.assign({}, channelPickerPayload(session), { ephemeral: true }));
       }
 
       return;
