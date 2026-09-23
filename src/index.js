@@ -16,6 +16,7 @@ const {
   ActionRowBuilder,
   ButtonBuilder,
   ButtonStyle,
+  ChannelSelectMenuBuilder,
   EmbedBuilder,
   ModalBuilder,
   TextInputBuilder,
@@ -521,7 +522,7 @@ function controlPanel(guildId) {
     new ButtonBuilder().setCustomId('tts:library').setLabel('ボイス一覧').setEmoji('🎙️').setStyle(ButtonStyle.Primary),
     new ButtonBuilder().setCustomId('tts:favorites').setLabel('お気に入り').setEmoji('⭐').setStyle(ButtonStyle.Secondary),
     new ButtonBuilder().setCustomId('tts:search').setLabel('ボイス検索').setEmoji('🔎').setStyle(ButtonStyle.Secondary),
-    new ButtonBuilder().setCustomId('tts:setchannel').setLabel('このチャンネルを読む').setEmoji('📖').setStyle(ButtonStyle.Success)
+    new ButtonBuilder().setCustomId('tts:setchannel').setLabel('読み上げCH変更').setEmoji('📖').setStyle(ButtonStyle.Success)
   );
 
   const row3 = new ActionRowBuilder().addComponents(
@@ -821,6 +822,26 @@ client.on(Events.InteractionCreate, async interaction => {
       return;
     }
 
+    if (interaction.isChannelSelectMenu()) {
+      if (interaction.customId === 'tts:channelselect') {
+        const selected = interaction.values && interaction.values[0];
+        if (!selected) return interaction.reply({ content: 'チャンネルを選択してください。', ephemeral: true });
+
+        const channel = await interaction.guild.channels.fetch(selected).catch(() => null);
+        if (!channel || channel.type !== ChannelType.GuildText) {
+          return interaction.reply({ content: 'テキストチャンネルを選択してください。', ephemeral: true });
+        }
+
+        patchGuild(interaction.guildId, { source_channel_id: channel.id });
+        await refreshPanel(interaction.guild);
+        return interaction.update({
+          content: '✅ 読み上げ対象を <#' + channel.id + '> に変更しました。',
+          components: []
+        });
+      }
+      return;
+    }
+
     if (!interaction.isButton()) return;
 
     if (interaction.customId === 'voice:empty:all') return showLibrary(interaction, '', false, false);
@@ -854,7 +875,21 @@ client.on(Events.InteractionCreate, async interaction => {
       } else if (action === 'library') return showLibrary(interaction, '', false, false);
       else if (action === 'favorites') return showLibrary(interaction, '', true, false);
       else if (action === 'search') return interaction.showModal(searchModal());
-      else if (action === 'setchannel') patchGuild(interaction.guildId, { source_channel_id: interaction.channelId });
+      else if (action === 'setchannel') {
+        const picker = new ChannelSelectMenuBuilder()
+          .setCustomId('tts:channelselect')
+          .setPlaceholder('読み上げるテキストチャンネルを選択')
+          .setChannelTypes(ChannelType.GuildText)
+          .setMinValues(1)
+          .setMaxValues(1);
+
+        const row = new ActionRowBuilder().addComponents(picker);
+        return interaction.reply({
+          content: '📖 **読み上げるチャンネルを選んでください**',
+          components: [row],
+          ephemeral: true
+        });
+      }
       else if (action === 'speeddown' || action === 'speedup') {
         const g = guildSettings(interaction.guildId);
         const next = Math.max(0.5, Math.min(2, Number(g.speed) + (action === 'speedup' ? 0.1 : -0.1)));
