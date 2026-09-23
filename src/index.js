@@ -17,6 +17,7 @@ const {
   ButtonBuilder,
   ButtonStyle,
   ChannelSelectMenuBuilder,
+  StringSelectMenuBuilder,
   EmbedBuilder,
   ModalBuilder,
   TextInputBuilder,
@@ -49,7 +50,7 @@ const REQUEST_TIMEOUT_MS = Math.max(2000, Number(process.env.TTS_REQUEST_TIMEOUT
 fs.mkdirSync(DATA_DIR, { recursive: true });
 fs.mkdirSync(CACHE_DIR, { recursive: true });
 
-let state = { guilds: {}, voices: {}, favorites: {}, dictionaries: {} };
+let state = { guilds: {}, voices: {}, favorites: {}, dictionaries: {}, users: {} };
 
 try {
   if (fs.existsSync(STATE_FILE)) {
@@ -58,7 +59,8 @@ try {
       guilds: parsed.guilds || {},
       voices: parsed.voices || {},
       favorites: parsed.favorites || {},
-      dictionaries: parsed.dictionaries || {}
+      dictionaries: parsed.dictionaries || {},
+      users: parsed.users || {}
     };
   }
 } catch (e) {
@@ -87,6 +89,9 @@ function guildSettings(guildId) {
       source_channel_id: null,
       panel_channel_id: null,
       panel_message_id: null,
+      settings_launcher_channel_id: null,
+      settings_launcher_message_id: null,
+      auto_join: true,
       tts_enabled: false,
       speed: 1,
       volume: 1
@@ -101,6 +106,41 @@ function patchGuild(guildId, patch) {
   Object.assign(g, patch);
   saveStateSoon();
   return g;
+}
+
+function userKey(guildId, userId) {
+  return guildId + ':' + userId;
+}
+
+function userPrefs(guildId, userId) {
+  const key = userKey(guildId, userId);
+  if (!state.users[key]) {
+    state.users[key] = {
+      voice_id: null,
+      speed: null,
+      volume: null
+    };
+    saveStateSoon();
+  }
+  return state.users[key];
+}
+
+function patchUser(guildId, userId, patch) {
+  const p = userPrefs(guildId, userId);
+  Object.assign(p, patch);
+  saveStateSoon();
+  return p;
+}
+
+function effectivePrefs(guildId, userId) {
+  const g = guildSettings(guildId);
+  const p = userPrefs(guildId, userId);
+  const firstVoice = Object.values(state.voices).find(v => v.enabled !== false);
+  return {
+    voice_id: p.voice_id || g.voice_id || (firstVoice ? firstVoice.id : null),
+    speed: p.speed == null ? Number(g.speed || 1) : Number(p.speed),
+    volume: p.volume == null ? Number(g.volume || 1) : Number(p.volume)
+  };
 }
 
 function favoriteKey(guildId, userId) {
@@ -295,19 +335,21 @@ function audioState(guildId) {
   return audioStates.get(guildId);
 }
 
-async function connectTo(member) {
-  const channel = member.voice && member.voice.channel;
-  if (!channel) throw new Error('先にボイスチャンネルへ参加してください。');
+async function connectChannel(channel) {
+  if (!channel || !channel.guild) throw new Error('VCが見つかりません。');
 
-  const s = audioState(member.guild.id);
+  const s = audioState(channel.guild.id);
+  const currentChannelId = s.connection && s.connection.joinConfig ? s.connection.joinConfig.channelId : null;
+  if (currentChannelId === channel.id) return channel;
+
   if (s.connection) {
     try { s.connection.destroy(); } catch {}
   }
 
   const connection = joinVoiceChannel({
     channelId: channel.id,
-    guildId: member.guild.id,
-    adapterCreator: member.guild.voiceAdapterCreator,
+    guildId: channel.guild.id,
+    adapterCreator: channel.guild.voiceAdapterCreator,
     selfDeaf: false,
     selfMute: false
   });
@@ -316,6 +358,32 @@ async function connectTo(member) {
   connection.subscribe(s.player);
   await entersState(connection, VoiceConnectionStatus.Ready, 15000);
   return channel;
+}
+
+async function connectTo(member) {
+  const channel = member.voice && member.voice.channel;
+  if (!channel) throw new Error('先にボイスチャンネルへ参加してください。');
+  return connectChannel(channel);
+}
+
+function connectedChannelId(guildId) {
+  const s = audioStates.get(guildId);
+  return s && s.connection && s.connection.joinConfig ? s.connection.joinConfig.channelId : null;
+}
+
+function humanMembers(channel) {
+  if (!channel || !channel.members) return [];
+  return Array.from(channel.members.values()).filter(m => !m.user.bot);
+}
+
+function findOccupiedVoiceChannel(guild, excludeId) {
+  return Array.from(guild.channels.cache.values())
+    .filter(ch =>
+      (ch.type === ChannelType.GuildVoice || ch.type === ChannelType.GuildStageVoice) &&
+      ch.id !== excludeId &&
+      humanMembers(ch).length > 0
+    )
+    .sort((a, b) => b.members.size - a.members.size)[0] || null;
 }
 
 function disconnect(guildId) {
@@ -504,7 +572,7 @@ function controlPanel(guildId) {
     .addFields(
       { name: 'VC', value: isConnected(guildId) ? '🟢 接続中' : '⚫ 未接続', inline: true },
       { name: '読み上げ', value: g.tts_enabled ? '🟢 ON' : '⚫ OFF', inline: true },
-      { name: '現在の声', value: voiceLabel(g), inline: false },
+      { name: '既定の声', value: voiceLabel(g) + '\n各自の声・速度・音量は「自分用BOT設定」から変更', inline: false },
       { name: '読み上げ対象', value: g.source_channel_id ? '<#' + g.source_channel_id + '>' : '未設定', inline: true },
       { name: '速度', value: Number(g.speed).toFixed(2) + 'x', inline: true },
       { name: '音量', value: Math.round(Number(g.volume) * 100) + '%', inline: true }
@@ -521,7 +589,7 @@ function controlPanel(guildId) {
   const row2 = new ActionRowBuilder().addComponents(
     new ButtonBuilder().setCustomId('tts:library').setLabel('ボイス一覧').setEmoji('🎙️').setStyle(ButtonStyle.Primary),
     new ButtonBuilder().setCustomId('tts:favorites').setLabel('お気に入り').setEmoji('⭐').setStyle(ButtonStyle.Secondary),
-    new ButtonBuilder().setCustomId('tts:search').setLabel('ボイス検索').setEmoji('🔎').setStyle(ButtonStyle.Secondary),
+    new ButtonBuilder().setCustomId('settings:open').setLabel('自分用BOT設定').setEmoji('👤').setStyle(ButtonStyle.Primary),
     new ButtonBuilder().setCustomId('tts:setchannel').setLabel('読み上げCH変更').setEmoji('📖').setStyle(ButtonStyle.Success)
   );
 
@@ -534,6 +602,39 @@ function controlPanel(guildId) {
   );
 
   return { embeds: [embed], components: [row1, row2, row3] };
+}
+
+function personalPanel(guildId, userId) {
+  const p = effectivePrefs(guildId, userId);
+  const voice = getVoice(p.voice_id);
+  const g = guildSettings(guildId);
+
+  const embed = new EmbedBuilder()
+    .setTitle('👤 自分用BOT設定')
+    .setDescription('この画面はあなたにしか見えません。あなたの発言だけに適用されます。')
+    .addFields(
+      { name: '自分の声', value: voice ? voice.name + (voice.style ? ' / ' + voice.style : '') : '未選択', inline: false },
+      { name: '速度', value: Number(p.speed).toFixed(2) + 'x', inline: true },
+      { name: '音量', value: Math.round(Number(p.volume) * 100) + '%', inline: true },
+      { name: '読み上げ対象', value: g.source_channel_id ? '<#' + g.source_channel_id + '>' : '未設定', inline: false }
+    );
+
+  const row1 = new ActionRowBuilder().addComponents(
+    new ButtonBuilder().setCustomId('personal:library').setLabel('自分の声を選ぶ').setEmoji('🎙️').setStyle(ButtonStyle.Primary),
+    new ButtonBuilder().setCustomId('personal:favorites').setLabel('お気に入り').setEmoji('⭐').setStyle(ButtonStyle.Secondary),
+    new ButtonBuilder().setCustomId('personal:search').setLabel('ボイス検索').setEmoji('🔎').setStyle(ButtonStyle.Secondary),
+    new ButtonBuilder().setCustomId('personal:preview').setLabel('今の声を試聴').setEmoji('🔊').setStyle(ButtonStyle.Secondary)
+  );
+
+  const row2 = new ActionRowBuilder().addComponents(
+    new ButtonBuilder().setCustomId('personal:speeddown').setLabel('速度 −').setStyle(ButtonStyle.Secondary),
+    new ButtonBuilder().setCustomId('personal:speedup').setLabel('速度 ＋').setStyle(ButtonStyle.Secondary),
+    new ButtonBuilder().setCustomId('personal:voldown').setLabel('音量 −').setStyle(ButtonStyle.Secondary),
+    new ButtonBuilder().setCustomId('personal:volup').setLabel('音量 ＋').setStyle(ButtonStyle.Secondary),
+    new ButtonBuilder().setCustomId('personal:reset').setLabel('既定値に戻す').setStyle(ButtonStyle.Danger)
+  );
+
+  return { embeds: [embed], components: [row1, row2] };
 }
 
 function searchModal() {
@@ -719,6 +820,46 @@ async function refreshPanel(guild) {
   }
 }
 
+function settingsLauncherPayload() {
+  const embed = new EmbedBuilder()
+    .setTitle('🔊 読み上げBOT 個人設定')
+    .setDescription('下のボタンを押すと、**自分にしか見えない設定画面**が開きます。\n声・速度・音量はユーザーごとに別々です。');
+
+  const row = new ActionRowBuilder().addComponents(
+    new ButtonBuilder().setCustomId('settings:open').setLabel('自分用BOT設定を開く').setEmoji('👤').setStyle(ButtonStyle.Primary)
+  );
+  return { embeds: [embed], components: [row] };
+}
+
+async function ensureSettingsLauncher(guild) {
+  const g = guildSettings(guild.id);
+  if (!g.source_channel_id) return null;
+
+  const channel = await guild.channels.fetch(g.source_channel_id).catch(() => null);
+  if (!channel || !canSend(channel)) return null;
+
+  if (g.settings_launcher_channel_id && g.settings_launcher_message_id) {
+    const oldChannel = await guild.channels.fetch(g.settings_launcher_channel_id).catch(() => null);
+    if (oldChannel) {
+      const oldMessage = await oldChannel.messages.fetch(g.settings_launcher_message_id).catch(() => null);
+      if (oldMessage) {
+        if (oldChannel.id === channel.id) {
+          await oldMessage.edit(settingsLauncherPayload()).catch(() => {});
+          return oldMessage;
+        }
+        await oldMessage.delete().catch(() => {});
+      }
+    }
+  }
+
+  const msg = await channel.send(settingsLauncherPayload());
+  patchGuild(guild.id, {
+    settings_launcher_channel_id: channel.id,
+    settings_launcher_message_id: msg.id
+  });
+  return msg;
+}
+
 async function showLibrary(interaction, query, favoritesOnly, edit) {
   const items = listVoices({
     query: query || '',
@@ -734,8 +875,8 @@ async function showLibrary(interaction, query, favoritesOnly, edit) {
 }
 
 async function previewVoice(interaction, voice, asFile) {
-  const g = guildSettings(interaction.guildId);
-  const file = await ensureAudio(voice.id, PREVIEW_TEXT, { speed: g.speed, volume: g.volume });
+  const p = effectivePrefs(interaction.guildId, interaction.user.id);
+  const file = await ensureAudio(voice.id, PREVIEW_TEXT, { speed: p.speed, volume: p.volume });
 
   if (asFile) {
     const name = (voice.name + '-' + (voice.style || 'voice')).replace(/[\\/:*?"<>|]/g, '_');
@@ -768,6 +909,7 @@ client.once(Events.ClientReady, async ready => {
   for (const guild of ready.guilds.cache.values()) {
     try {
       if (!await refreshPanel(guild)) await installPanel(guild);
+      await ensureSettingsLauncher(guild);
     } catch (e) {
       console.error('Panel install failed for ' + guild.id + ':', e.message);
     }
@@ -782,6 +924,74 @@ client.on(Events.GuildCreate, async guild => {
     console.error('Guild setup failed:', e);
   }
 });
+
+const channelSessions = new Map();
+
+async function createChannelSession(interaction) {
+  const fetched = await interaction.guild.channels.fetch();
+  const channels = Array.from(fetched.values())
+    .filter(Boolean)
+    .filter(ch =>
+      ch.type === ChannelType.GuildText ||
+      ch.type === ChannelType.GuildAnnouncement ||
+      ch.type === ChannelType.PublicThread ||
+      ch.type === ChannelType.PrivateThread ||
+      ch.type === ChannelType.AnnouncementThread
+    )
+    .sort((a, b) => {
+      const ac = a.parent ? a.parent.rawPosition : -1;
+      const bc = b.parent ? b.parent.rawPosition : -1;
+      if (ac !== bc) return ac - bc;
+      return (a.rawPosition || 0) - (b.rawPosition || 0);
+    })
+    .map(ch => ({
+      id: ch.id,
+      name: ch.name,
+      category: ch.parent ? ch.parent.name : 'カテゴリなし',
+      type: ch.type
+    }));
+
+  const id = crypto.randomBytes(4).toString('hex');
+  const session = { id, guildId: interaction.guildId, userId: interaction.user.id, channels, page: 0, createdAt: Date.now() };
+  channelSessions.set(id, session);
+  return session;
+}
+
+function channelPickerPayload(session) {
+  const pageSize = 24;
+  const pages = Math.max(1, Math.ceil(session.channels.length / pageSize));
+  session.page = Math.max(0, Math.min(session.page, pages - 1));
+  const start = session.page * pageSize;
+  const items = session.channels.slice(start, start + pageSize);
+
+  const select = new StringSelectMenuBuilder()
+    .setCustomId('chpick:' + session.id + ':select')
+    .setPlaceholder(items.length ? '読み上げ対象を選択' : '選択できるチャンネルがありません')
+    .setMinValues(items.length ? 1 : 0)
+    .setMaxValues(items.length ? 1 : 0)
+    .setDisabled(items.length === 0);
+
+  if (items.length) {
+    select.addOptions(items.map(ch => ({
+      label: ('# ' + ch.name).slice(0, 100),
+      description: ch.category.slice(0, 100),
+      value: ch.id
+    })));
+  } else {
+    select.addOptions({ label: '利用可能なチャンネルなし', value: 'none', description: 'BOTの権限を確認してください' });
+  }
+
+  const row1 = new ActionRowBuilder().addComponents(select);
+  const row2 = new ActionRowBuilder().addComponents(
+    new ButtonBuilder().setCustomId('chpick:' + session.id + ':prev').setLabel('◀ 前へ').setStyle(ButtonStyle.Secondary).setDisabled(session.page <= 0),
+    new ButtonBuilder().setCustomId('chpick:' + session.id + ':next').setLabel('次へ ▶').setStyle(ButtonStyle.Secondary).setDisabled(session.page >= pages - 1)
+  );
+
+  return {
+    content: '📖 **読み上げ対象チャンネルを選択**\n全 ' + session.channels.length + ' 件 / ' + (session.page + 1) + ' / ' + pages + ' ページ',
+    components: [row1, row2]
+  };
+}
 
 client.on(Events.InteractionCreate, async interaction => {
   try {
@@ -822,6 +1032,29 @@ client.on(Events.InteractionCreate, async interaction => {
       return;
     }
 
+    if (interaction.isStringSelectMenu()) {
+      if (interaction.customId.startsWith('chpick:')) {
+        const parts = interaction.customId.split(':');
+        const session = channelSessions.get(parts[1]);
+        if (!session || session.guildId !== interaction.guildId || session.userId !== interaction.user.id) {
+          return interaction.reply({ content: 'このチャンネル選択画面は期限切れです。もう一度開いてください。', ephemeral: true });
+        }
+
+        const selected = interaction.values && interaction.values[0];
+        const found = session.channels.find(ch => ch.id === selected);
+        if (!found) return interaction.reply({ content: 'チャンネルを選択できませんでした。', ephemeral: true });
+
+        patchGuild(interaction.guildId, { source_channel_id: found.id });
+        await refreshPanel(interaction.guild);
+        await ensureSettingsLauncher(interaction.guild);
+        return interaction.update({
+          content: '✅ 読み上げ対象を <#' + found.id + '> に変更しました。',
+          components: []
+        });
+      }
+      return;
+    }
+
     if (interaction.isChannelSelectMenu()) {
       if (interaction.customId === 'tts:channelselect') {
         const selected = interaction.values && interaction.values[0];
@@ -846,6 +1079,51 @@ client.on(Events.InteractionCreate, async interaction => {
 
     if (interaction.customId === 'voice:empty:all') return showLibrary(interaction, '', false, false);
     if (interaction.customId === 'voice:empty:search') return interaction.showModal(searchModal());
+
+    if (interaction.customId === 'settings:open') {
+      return interaction.reply(Object.assign({}, personalPanel(interaction.guildId, interaction.user.id), { ephemeral: true }));
+    }
+
+    if (interaction.customId.startsWith('personal:')) {
+      const action = interaction.customId.split(':')[1];
+      const current = effectivePrefs(interaction.guildId, interaction.user.id);
+
+      if (action === 'library') return showLibrary(interaction, '', false, false);
+      if (action === 'favorites') return showLibrary(interaction, '', true, false);
+      if (action === 'search') return interaction.showModal(searchModal());
+
+      if (action === 'preview') {
+        const voice = getVoice(current.voice_id);
+        if (!voice) return interaction.reply({ content: '先に声を選んでください。', ephemeral: true });
+        await interaction.deferUpdate();
+        await previewVoice(interaction, voice, false);
+        return;
+      }
+
+      if (action === 'speeddown' || action === 'speedup') {
+        const next = Math.max(0.5, Math.min(2, Number(current.speed) + (action === 'speedup' ? 0.1 : -0.1)));
+        patchUser(interaction.guildId, interaction.user.id, { speed: Number(next.toFixed(2)) });
+      } else if (action === 'voldown' || action === 'volup') {
+        const next = Math.max(0.1, Math.min(2, Number(current.volume) + (action === 'volup' ? 0.1 : -0.1)));
+        patchUser(interaction.guildId, interaction.user.id, { volume: Number(next.toFixed(2)) });
+      } else if (action === 'reset') {
+        patchUser(interaction.guildId, interaction.user.id, { voice_id: null, speed: null, volume: null });
+      }
+
+      return interaction.update(personalPanel(interaction.guildId, interaction.user.id));
+    }
+
+    if (interaction.customId.startsWith('chpick:')) {
+      const parts = interaction.customId.split(':');
+      const session = channelSessions.get(parts[1]);
+      const action = parts[2];
+      if (!session || session.guildId !== interaction.guildId || session.userId !== interaction.user.id) {
+        return interaction.reply({ content: 'このチャンネル選択画面は期限切れです。もう一度開いてください。', ephemeral: true });
+      }
+      if (action === 'prev') session.page--;
+      if (action === 'next') session.page++;
+      return interaction.update(channelPickerPayload(session));
+    }
 
     if (interaction.customId.startsWith('tts:')) {
       const action = interaction.customId.split(':')[1];
@@ -876,19 +1154,11 @@ client.on(Events.InteractionCreate, async interaction => {
       else if (action === 'favorites') return showLibrary(interaction, '', true, false);
       else if (action === 'search') return interaction.showModal(searchModal());
       else if (action === 'setchannel') {
-        const picker = new ChannelSelectMenuBuilder()
-          .setCustomId('tts:channelselect')
-          .setPlaceholder('読み上げるテキストチャンネルを選択')
-          .setChannelTypes(ChannelType.GuildText)
-          .setMinValues(1)
-          .setMaxValues(1);
-
-        const row = new ActionRowBuilder().addComponents(picker);
-        return interaction.reply({
-          content: '📖 **読み上げるチャンネルを選んでください**',
-          components: [row],
-          ephemeral: true
-        });
+        if (!isAdmin(interaction)) {
+          return interaction.reply({ content: '読み上げ対象チャンネルの変更は管理者のみ可能です。', ephemeral: true });
+        }
+        const session = await createChannelSession(interaction);
+        return interaction.reply(Object.assign({}, channelPickerPayload(session), { ephemeral: true }));
       }
       else if (action === 'speeddown' || action === 'speedup') {
         const g = guildSettings(interaction.guildId);
@@ -954,8 +1224,7 @@ client.on(Events.InteractionCreate, async interaction => {
       if (action === 'prev') session.index = (session.index - 1 + session.items.length) % session.items.length;
       else if (action === 'next') session.index = (session.index + 1) % session.items.length;
       else if (action === 'select') {
-        patchGuild(interaction.guildId, { voice_id: voice.id });
-        await refreshPanel(interaction.guild);
+        patchUser(interaction.guildId, interaction.user.id, { voice_id: voice.id });
       } else if (action === 'fav') toggleFavorite(interaction.guildId, interaction.user.id, voice.id);
       else if (action === 'search') return interaction.showModal(searchModal());
       else if (action === 'all') return showLibrary(interaction, '', false, true);
@@ -979,6 +1248,55 @@ client.on(Events.InteractionCreate, async interaction => {
   }
 });
 
+client.on(Events.VoiceStateUpdate, async (oldState, newState) => {
+  try {
+    const guild = newState.guild || oldState.guild;
+    const g = guildSettings(guild.id);
+    if (!g.auto_join) return;
+
+    const member = newState.member || oldState.member;
+    if (!member || member.user.bot) return;
+
+    const joinedChannel = newState.channel;
+    const leftChannel = oldState.channel;
+    const currentId = connectedChannelId(guild.id);
+
+    if (joinedChannel && joinedChannel.id !== oldState.channelId) {
+      if (!currentId) {
+        await connectChannel(joinedChannel);
+        await refreshPanel(guild);
+        await ensureSettingsLauncher(guild);
+      } else if (currentId !== joinedChannel.id) {
+        const current = guild.channels.cache.get(currentId);
+        if (!current || humanMembers(current).length === 0) {
+          await connectChannel(joinedChannel);
+          await refreshPanel(guild);
+          await ensureSettingsLauncher(guild);
+        }
+      }
+    }
+
+    if (leftChannel && leftChannel.id === currentId) {
+      setTimeout(async () => {
+        try {
+          const current = guild.channels.cache.get(leftChannel.id);
+          if (current && humanMembers(current).length > 0) return;
+
+          const other = findOccupiedVoiceChannel(guild, leftChannel.id);
+          if (other) await connectChannel(other);
+          else disconnect(guild.id);
+
+          await refreshPanel(guild);
+        } catch (e) {
+          console.error('Auto voice leave/move failed:', e);
+        }
+      }, 1200);
+    }
+  } catch (e) {
+    console.error('Voice auto join failed:', e);
+  }
+});
+
 client.on(Events.MessageCreate, message => {
   try {
     if (!message.guild || message.author.bot || !message.content.trim()) return;
@@ -986,11 +1304,13 @@ client.on(Events.MessageCreate, message => {
     const g = guildSettings(message.guild.id);
     if (!g.tts_enabled) return;
     if (!g.source_channel_id || message.channel.id !== g.source_channel_id) return;
-    if (!g.voice_id || !isConnected(message.guild.id)) return;
-    if (!getVoice(g.voice_id)) return;
+    if (!isConnected(message.guild.id)) return;
+
+    const p = effectivePrefs(message.guild.id, message.author.id);
+    if (!p.voice_id || !getVoice(p.voice_id)) return;
 
     const text = applyDictionary(message.guild.id, message.content.trim());
-    const accepted = queueMessage(message.guild.id, g.voice_id, text, g.speed, g.volume);
+    const accepted = queueMessage(message.guild.id, p.voice_id, text, p.speed, p.volume);
     if (!accepted) console.warn('TTS queue rejected a message in guild ' + message.guild.id);
   } catch (e) {
     console.error('Message TTS error:', e);
