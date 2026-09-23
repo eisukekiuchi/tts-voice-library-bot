@@ -1252,7 +1252,7 @@ client.on(Events.VoiceStateUpdate, async (oldState, newState) => {
   try {
     const guild = newState.guild || oldState.guild;
     const g = guildSettings(guild.id);
-    if (!g.auto_join) return;
+    if (g.auto_join === false) return;
 
     const member = newState.member || oldState.member;
     if (!member || member.user.bot) return;
