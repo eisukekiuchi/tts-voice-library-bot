@@ -1,0 +1,20 @@
+{
+  "name": "tts-voice-library-bot",
+  "version": "0.4.0",
+  "private": true,
+  "description": "Button-only Discord TTS voice library bot for Railway",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js"
+  },
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "dependencies": {
+    "@discordjs/voice": "^0.19.2",
+    "discord.js": "^14.27.0",
+    "dotenv": "^17.2.2",
+    "libsodium-wrappers": "^0.7.15",
+    "opusscript": "^0.1.1"
+  }
+}
