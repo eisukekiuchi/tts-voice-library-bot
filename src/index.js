@@ -40,7 +40,8 @@ const CACHE_DIR = path.resolve(process.env.CACHE_DIR || path.join(DATA_DIR, 'cac
 const STATE_FILE = path.join(DATA_DIR, 'state.json');
 
 const PREVIEW_TEXT = process.env.PREVIEW_TEXT || 'こんにちは。こちらは音声サンプルです。今日もよろしくお願いします。';
-const CHUNK_CHARS = Math.max(60, Number(process.env.TTS_CHUNK_CHARS || 180));
+const FIRST_CHUNK_CHARS = Math.max(12, Number(process.env.TTS_FIRST_CHUNK_CHARS || 40));
+const CHUNK_CHARS = Math.max(60, Number(process.env.TTS_CHUNK_CHARS || 140));
 const MAX_TEXT_CHARS = Math.max(CHUNK_CHARS, Number(process.env.TTS_MAX_TEXT_CHARS || 6000));
 const SYNTH_CONCURRENCY = Math.max(1, Number(process.env.TTS_SYNTH_CONCURRENCY || 4));
 const MAX_PENDING_MESSAGES = Math.max(10, Number(process.env.TTS_MAX_PENDING_MESSAGES || 500));
@@ -135,9 +136,10 @@ function patchUser(guildId, userId, patch) {
 function effectivePrefs(guildId, userId) {
   const g = guildSettings(guildId);
   const p = userPrefs(guildId, userId);
-  const firstVoice = Object.values(state.voices).find(v => v.enabled !== false);
+  const available = Object.values(state.voices).filter(v => v.enabled !== false);
+  const fastVoice = available.find(v => v.engine_id === 'voicevox-fast') || available[0];
   return {
-    voice_id: p.voice_id || g.voice_id || (firstVoice ? firstVoice.id : null),
+    voice_id: p.voice_id || g.voice_id || (fastVoice ? fastVoice.id : null),
     speed: p.speed == null ? Number(g.speed || 1) : Number(p.speed),
     volume: p.volume == null ? Number(g.volume || 1) : Number(p.volume)
   };
@@ -277,6 +279,9 @@ async function synthesize(voice, text, options) {
   );
   query.speedScale = Number(options.speed || 1);
   query.volumeScale = Number(options.volume || 1);
+  // 発話開始を最短化。VOICEVOX/AivisSpeech互換の前後無音を削る。
+  query.prePhonemeLength = 0;
+  query.postPhonemeLength = 0;
 
   const res = await fetch(engine.url + '/synthesis?speaker=' + speaker, {
     method: 'POST',
@@ -490,25 +495,36 @@ function cleanText(input) {
     .slice(0, MAX_TEXT_CHARS);
 }
 
+function cutNatural(text, limit) {
+  if (text.length <= limit) return text.length;
+  const min = Math.max(1, Math.floor(limit * 0.45));
+  let cut = -1;
+  for (const token of ['。', '！', '？', '、', ',', ' ', '\n']) {
+    const idx = text.lastIndexOf(token, limit);
+    if (idx >= min) cut = Math.max(cut, idx + token.length);
+  }
+  return cut > 0 ? cut : limit;
+}
+
 function splitText(input) {
   let text = cleanText(input);
   const out = [];
+  let first = true;
+
   while (text.length) {
-    if (text.length <= CHUNK_CHARS) {
+    const limit = first ? FIRST_CHUNK_CHARS : CHUNK_CHARS;
+    if (text.length <= limit) {
       out.push(text);
       break;
     }
-    const min = Math.floor(CHUNK_CHARS * 0.45);
-    let cut = -1;
-    for (const token of ['。', '！', '？', '、', ',', ' ', '\n']) {
-      const idx = text.lastIndexOf(token, CHUNK_CHARS);
-      if (idx >= min) cut = Math.max(cut, idx + token.length);
-    }
-    if (cut < 1) cut = CHUNK_CHARS;
+
+    const cut = cutNatural(text, limit);
     const part = text.slice(0, cut).trim();
     if (part) out.push(part);
     text = text.slice(cut).trim();
+    first = false;
   }
+
   return out;
 }
 
@@ -620,10 +636,11 @@ function personalPanel(guildId, userId) {
     );
 
   const row1 = new ActionRowBuilder().addComponents(
-    new ButtonBuilder().setCustomId('personal:library').setLabel('自分の声を選ぶ').setEmoji('🎙️').setStyle(ButtonStyle.Primary),
+    new ButtonBuilder().setCustomId('personal:fastvoices').setLabel('神速ボイス').setEmoji('⚡').setStyle(ButtonStyle.Success),
+    new ButtonBuilder().setCustomId('personal:library').setLabel('全ボイス').setEmoji('🎙️').setStyle(ButtonStyle.Primary),
     new ButtonBuilder().setCustomId('personal:favorites').setLabel('お気に入り').setEmoji('⭐').setStyle(ButtonStyle.Secondary),
-    new ButtonBuilder().setCustomId('personal:search').setLabel('ボイス検索').setEmoji('🔎').setStyle(ButtonStyle.Secondary),
-    new ButtonBuilder().setCustomId('personal:preview').setLabel('今の声を試聴').setEmoji('🔊').setStyle(ButtonStyle.Secondary)
+    new ButtonBuilder().setCustomId('personal:search').setLabel('検索').setEmoji('🔎').setStyle(ButtonStyle.Secondary),
+    new ButtonBuilder().setCustomId('personal:preview').setLabel('試聴').setEmoji('🔊').setStyle(ButtonStyle.Secondary)
   );
 
   const row2 = new ActionRowBuilder().addComponents(
@@ -1094,6 +1111,7 @@ client.on(Events.InteractionCreate, async interaction => {
       const action = interaction.customId.split(':')[1];
       const current = effectivePrefs(interaction.guildId, interaction.user.id);
 
+      if (action === 'fastvoices') return showLibrary(interaction, 'VOICEVOX 神速', false, false);
       if (action === 'library') return showLibrary(interaction, '', false, false);
       if (action === 'favorites') return showLibrary(interaction, '', true, false);
       if (action === 'search') return interaction.showModal(searchModal());
