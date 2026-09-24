@@ -1389,7 +1389,7 @@ async function announceVoiceJoin(member, channel) {
   if (!p.voice_id || !getVoice(p.voice_id)) return;
 
   const name = speakerName(member);
-  queueMessage(member.guild.id, p.voice_id, name + 'さんが参加しました。', p.speed, p.volume);
+  queueMessage(member.guild.id, p.voice_id, name + 'さんがVCに入室しました。', p.speed, p.volume);
 }
 
 client.on(Events.VoiceStateUpdate, async (oldState, newState) => {
