@@ -740,7 +740,7 @@ function householdModal(guildId, userId) {
   const input = new TextInputBuilder()
     .setCustomId('household_name')
     .setLabel('家名')
-    .setPlaceholder('例：木内家')
+    .setPlaceholder('例：えにぐま')
     .setRequired(true)
     .setMinLength(1)
     .setMaxLength(32)
