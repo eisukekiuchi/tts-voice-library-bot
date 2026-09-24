@@ -39,15 +39,16 @@ const DATA_DIR = path.resolve(process.env.DATA_DIR || path.join(process.cwd(), '
 const CACHE_DIR = path.resolve(process.env.CACHE_DIR || path.join(DATA_DIR, 'cache'));
 const STATE_FILE = path.join(DATA_DIR, 'state.json');
 
-const PREVIEW_TEXT = process.env.PREVIEW_TEXT || 'こんにちは。こちらは音声サンプルです。今日もよろしくお願いします。';
+const PREVIEW_TEXT = process.env.PREVIEW_TEXT || 'こんにちは。音声サンプルです。';
 const FIRST_CHUNK_CHARS = Math.max(12, Number(process.env.TTS_FIRST_CHUNK_CHARS || 40));
 const CHUNK_CHARS = Math.max(60, Number(process.env.TTS_CHUNK_CHARS || 140));
 const MAX_TEXT_CHARS = Math.max(CHUNK_CHARS, Number(process.env.TTS_MAX_TEXT_CHARS || 6000));
-const SYNTH_CONCURRENCY = Math.max(1, Number(process.env.TTS_SYNTH_CONCURRENCY || 4));
+const FAST_SYNTH_CONCURRENCY = Math.max(2, Number(process.env.TTS_FAST_CONCURRENCY || process.env.TTS_SYNTH_CONCURRENCY || 6));
+const AI_SYNTH_CONCURRENCY = Math.max(1, Number(process.env.TTS_AI_CONCURRENCY || 2));
 const MAX_PENDING_MESSAGES = Math.max(10, Number(process.env.TTS_MAX_PENDING_MESSAGES || 500));
 const MAX_AUDIO_QUEUE = Math.max(100, Number(process.env.TTS_MAX_AUDIO_QUEUE || 3000));
 const REQUEST_TIMEOUT_MS = Math.max(2000, Number(process.env.TTS_REQUEST_TIMEOUT_MS || 20000));
-const DUCK_VOLUME = Math.max(0.05, Math.min(1, Number(process.env.TTS_DUCK_VOLUME || 0.22)));
+const DEFAULT_DUCK_VOLUME = Math.max(0.1, Math.min(1, Number(process.env.TTS_DUCK_VOLUME || 0.55)));
 const DUCK_RELEASE_MS = Math.max(0, Number(process.env.TTS_DUCK_RELEASE_MS || 350));
 
 fs.mkdirSync(DATA_DIR, { recursive: true });
@@ -95,6 +96,7 @@ function guildSettings(guildId) {
       settings_launcher_channel_id: null,
       settings_launcher_message_id: null,
       auto_join: true,
+      duck_volume: DEFAULT_DUCK_VOLUME,
       tts_enabled: false,
       speed: 1,
       volume: 1
@@ -120,6 +122,7 @@ function userPrefs(guildId, userId) {
   if (!state.users[key]) {
     state.users[key] = {
       household_name: null,
+      speak_name_prefix: true,
       voice_id: null,
       speed: null,
       volume: null
@@ -158,7 +161,8 @@ function effectivePrefs(guildId, userId) {
   return {
     voice_id: p.voice_id || g.voice_id || (fastVoice ? fastVoice.id : null),
     speed: p.speed == null ? Number(g.speed || 1) : Number(p.speed),
-    volume: p.volume == null ? Number(g.volume || 1) : Number(p.volume)
+    volume: p.volume == null ? Number(g.volume || 1) : Number(p.volume),
+    speak_name_prefix: p.speak_name_prefix !== false
   };
 }
 
@@ -377,11 +381,17 @@ function audioState(guildId) {
   return audioStates.get(guildId);
 }
 
+function guildDuckVolume(guildId) {
+  const g = guildSettings(guildId);
+  const value = g.duck_volume == null ? DEFAULT_DUCK_VOLUME : Number(g.duck_volume);
+  return Math.max(0.1, Math.min(1, Number.isFinite(value) ? value : DEFAULT_DUCK_VOLUME));
+}
+
 function applyDuckState(guildId) {
   const s = audioState(guildId);
   if (!s.currentResource || !s.currentResource.volume) return;
   const ducked = s.speakingUsers.size > 0;
-  s.currentResource.volume.setVolume(ducked ? DUCK_VOLUME : 1);
+  s.currentResource.volume.setVolume(ducked ? guildDuckVolume(guildId) : 1);
 }
 
 function bindSpeakingDucking(guild, connection) {
@@ -525,7 +535,7 @@ async function playNext(guildId) {
   const resource = createAudioResource(next, { inlineVolume: true });
   s.currentResource = resource;
   if (resource.volume) {
-    resource.volume.setVolume(s.speakingUsers.size > 0 ? DUCK_VOLUME : 1);
+    resource.volume.setVolume(s.speakingUsers.size > 0 ? guildDuckVolume(guildId) : 1);
   }
   s.player.play(resource);
 }
@@ -540,22 +550,26 @@ function audioStats(guildId) {
 }
 
 class TaskPool {
-  constructor(concurrency) {
+  constructor(concurrency, name) {
     this.concurrency = concurrency;
+    this.name = name || 'pool';
     this.active = 0;
-    this.waiting = [];
+    this.high = [];
+    this.normal = [];
   }
 
-  run(fn) {
+  run(fn, priority) {
     return new Promise((resolve, reject) => {
-      this.waiting.push({ fn, resolve, reject });
+      const task = { fn, resolve, reject };
+      if (priority === 0) this.high.push(task);
+      else this.normal.push(task);
       this.pump();
     });
   }
 
   pump() {
-    while (this.active < this.concurrency && this.waiting.length) {
-      const task = this.waiting.shift();
+    while (this.active < this.concurrency && (this.high.length || this.normal.length)) {
+      const task = this.high.shift() || this.normal.shift();
       this.active++;
       Promise.resolve()
         .then(task.fn)
@@ -566,9 +580,45 @@ class TaskPool {
         });
     }
   }
+
+  stats() {
+    return {
+      name: this.name,
+      active: this.active,
+      waiting: this.high.length + this.normal.length,
+      highWaiting: this.high.length,
+      concurrency: this.concurrency
+    };
+  }
 }
 
-const synthPool = new TaskPool(SYNTH_CONCURRENCY);
+const enginePools = new Map();
+
+function synthPoolForVoice(voiceId) {
+  const voice = getVoice(voiceId);
+  const engineId = voice ? voice.engine_id : 'default';
+  const isAi = engineId === 'aivis';
+  const key = isAi ? 'aivis' : engineId;
+  if (!enginePools.has(key)) {
+    enginePools.set(key, new TaskPool(
+      isAi ? AI_SYNTH_CONCURRENCY : FAST_SYNTH_CONCURRENCY,
+      key
+    ));
+  }
+  return enginePools.get(key);
+}
+
+function synthPoolStats() {
+  const rows = Array.from(enginePools.values()).map(pool => pool.stats());
+  return {
+    active: rows.reduce((n, x) => n + x.active, 0),
+    waiting: rows.reduce((n, x) => n + x.waiting, 0),
+    highWaiting: rows.reduce((n, x) => n + x.highWaiting, 0),
+    concurrency: rows.reduce((n, x) => n + x.concurrency, 0),
+    pools: rows
+  };
+}
+
 const pipelineGuilds = new Map();
 
 function pipelineGuild(guildId) {
@@ -637,7 +687,13 @@ function queueMessage(guildId, voiceId, text, speed, volume) {
   g.pending++;
   g.accepted++;
 
-  const generated = chunks.map(chunk => synthPool.run(() => ensureAudio(voiceId, chunk, { speed, volume })));
+  const pool = synthPoolForVoice(voiceId);
+  const generated = chunks.map((chunk, index) =>
+    pool.run(
+      () => ensureAudio(voiceId, chunk, { speed, volume }),
+      index === 0 ? 0 : 1
+    )
+  );
   const previous = g.tail.catch(() => {});
 
   g.tail = previous.then(async () => {
@@ -659,10 +715,13 @@ function queueMessage(guildId, voiceId, text, speed, volume) {
 
 function pipelineStats(guildId) {
   const g = pipelineGuild(guildId);
+  const pools = synthPoolStats();
   return {
-    active: synthPool.active,
-    waiting: synthPool.waiting.length,
-    concurrency: synthPool.concurrency,
+    active: pools.active,
+    waiting: pools.waiting,
+    highWaiting: pools.highWaiting,
+    concurrency: pools.concurrency,
+    pools: pools.pools,
     pending: g.pending,
     accepted: g.accepted,
     rejected: g.rejected,
@@ -726,6 +785,7 @@ function personalPanel(guildId, userId) {
     .setDescription('この画面はあなたにしか見えません。あなたの発言だけに適用されます。')
     .addFields(
       { name: '家名', value: registeredHouseholdName(guildId, userId) || '未登録（サーバー表示名を使用）', inline: false },
+      { name: '本文前の家名', value: p.speak_name_prefix ? '🟢 読む' : '⚫ 読まない', inline: true },
       { name: '自分の声', value: voice ? voice.name + (voice.style ? ' / ' + voice.style : '') : '未選択', inline: false },
       { name: '速度', value: Number(p.speed).toFixed(2) + 'x', inline: true },
       { name: '音量', value: Math.round(Number(p.volume) * 100) + '%', inline: true },
@@ -749,6 +809,11 @@ function personalPanel(guildId, userId) {
   );
 
   const row3 = new ActionRowBuilder().addComponents(
+    new ButtonBuilder()
+      .setCustomId('personal:nameprefix')
+      .setLabel(p.speak_name_prefix ? '文頭家名：ON' : '文頭家名：OFF')
+      .setEmoji('🏷️')
+      .setStyle(p.speak_name_prefix ? ButtonStyle.Success : ButtonStyle.Secondary),
     new ButtonBuilder().setCustomId('personal:reset').setLabel('既定値に戻す').setStyle(ButtonStyle.Danger)
   );
 
@@ -801,8 +866,17 @@ function dictRemoveModal() {
   return modal;
 }
 
-function adminPanel() {
-  const embed = new EmbedBuilder().setTitle('⚙️ 管理者メニュー').setDescription('ここもボタン操作です。');
+function adminPanel(guildId) {
+  const duck = guildDuckVolume(guildId);
+  const embed = new EmbedBuilder()
+    .setTitle('⚙️ 管理者メニュー')
+    .setDescription('ここもボタン操作です。')
+    .addFields({
+      name: '誰かがVCで話している間のBOT音量',
+      value: Math.round(duck * 100) + '%',
+      inline: true
+    });
+
   const row1 = new ActionRowBuilder().addComponents(
     new ButtonBuilder().setCustomId('admin:refreshvoices').setLabel('ボイス再読込').setEmoji('🔄').setStyle(ButtonStyle.Primary),
     new ButtonBuilder().setCustomId('admin:dictadd').setLabel('辞書追加').setEmoji('➕').setStyle(ButtonStyle.Secondary),
@@ -810,6 +884,8 @@ function adminPanel() {
     new ButtonBuilder().setCustomId('admin:dictlist').setLabel('辞書一覧').setEmoji('📚').setStyle(ButtonStyle.Secondary)
   );
   const row2 = new ActionRowBuilder().addComponents(
+    new ButtonBuilder().setCustomId('admin:duckdown').setLabel('会話中音量 −10%').setStyle(ButtonStyle.Secondary),
+    new ButtonBuilder().setCustomId('admin:duckup').setLabel('会話中音量 ＋10%').setStyle(ButtonStyle.Secondary),
     new ButtonBuilder().setCustomId('admin:movepanel').setLabel('設定パネルを移動').setEmoji('📌').setStyle(ButtonStyle.Success)
   );
   return { embeds: [embed], components: [row1, row2] };
@@ -996,7 +1072,10 @@ async function previewVoice(interaction, voice, asFile) {
     await refreshPanel(interaction.guild).catch(() => {});
   }
 
-  const file = await ensureAudio(voice.id, PREVIEW_TEXT, { speed: p.speed, volume: p.volume });
+  const file = await synthPoolForVoice(voice.id).run(
+    () => ensureAudio(voice.id, PREVIEW_TEXT, { speed: p.speed, volume: p.volume }),
+    0
+  );
 
   if (asFile) {
     const name = (voice.name + '-' + (voice.style || 'voice')).replace(/[\\/:*?"<>|]/g, '_');
@@ -1262,6 +1341,10 @@ client.on(Events.InteractionCreate, async interaction => {
       const current = effectivePrefs(interaction.guildId, interaction.user.id);
 
       if (action === 'household') return interaction.showModal(householdModal(interaction.guildId, interaction.user.id));
+      if (action === 'nameprefix') {
+        patchUser(interaction.guildId, interaction.user.id, { speak_name_prefix: !current.speak_name_prefix });
+        return interaction.update(personalPanel(interaction.guildId, interaction.user.id));
+      }
       if (action === 'fastvoices') return showLibrary(interaction, 'VOICEVOX 神速', false, false);
       if (action === 'library') return showLibrary(interaction, '', false, false);
       if (action === 'favorites') return showLibrary(interaction, '', true, false);
@@ -1287,7 +1370,12 @@ client.on(Events.InteractionCreate, async interaction => {
         const next = Math.max(0.1, Math.min(2, Number(current.volume) + (action === 'volup' ? 0.1 : -0.1)));
         patchUser(interaction.guildId, interaction.user.id, { volume: Number(next.toFixed(2)) });
       } else if (action === 'reset') {
-        patchUser(interaction.guildId, interaction.user.id, { voice_id: null, speed: null, volume: null });
+        patchUser(interaction.guildId, interaction.user.id, {
+          voice_id: null,
+          speed: null,
+          volume: null,
+          speak_name_prefix: true
+        });
       }
 
       return interaction.update(personalPanel(interaction.guildId, interaction.user.id));
@@ -1324,8 +1412,9 @@ client.on(Events.InteractionCreate, async interaction => {
           content:
             '⚡ **現在の処理状況**\n' +
             '生成中: **' + p.active + '/' + p.concurrency + '**\n' +
-            '生成待ち: **' + p.waiting + '**\n' +
+            '生成待ち: **' + p.waiting + '**（先頭優先: ' + p.highWaiting + '）\n' +
             'メッセージ処理待ち: **' + p.pending + '**\n' +
+            'VOICEVOX/Aivisは別キューで処理\n' +
             'VC再生待ち: **' + a.queued + '**\n' +
             'キャッシュ: 同じ文章・声・速度・音量なら再生成しません。',
           ephemeral: true
@@ -1350,7 +1439,7 @@ client.on(Events.InteractionCreate, async interaction => {
         patchGuild(interaction.guildId, { volume: Number(next.toFixed(2)) });
       } else if (action === 'admin') {
         if (!isAdmin(interaction)) return interaction.reply({ content: '管理者だけが開けます。', ephemeral: true });
-        return interaction.reply(Object.assign({}, adminPanel(), { ephemeral: true }));
+        return interaction.reply(Object.assign({}, adminPanel(interaction.guildId), { ephemeral: true }));
       }
 
       await refreshPanel(interaction.guild);
@@ -1375,6 +1464,14 @@ client.on(Events.InteractionCreate, async interaction => {
         const rows = Object.entries(dictFor(interaction.guildId));
         const txt = rows.length ? rows.slice(0, 80).map(x => '• **' + x[0] + '** → ' + x[1]).join('\n') : '辞書は空です。';
         return interaction.reply({ content: '📚 **読み上げ辞書**\n' + txt, ephemeral: true });
+      }
+
+      if (action === 'duckdown' || action === 'duckup') {
+        const currentDuck = guildDuckVolume(interaction.guildId);
+        const next = Math.max(0.1, Math.min(1, currentDuck + (action === 'duckup' ? 0.1 : -0.1)));
+        patchGuild(interaction.guildId, { duck_volume: Number(next.toFixed(2)) });
+        applyDuckState(interaction.guildId);
+        return interaction.update(adminPanel(interaction.guildId));
       }
 
       if (action === 'movepanel') {
@@ -1514,7 +1611,10 @@ client.on(Events.MessageCreate, message => {
     if (!p.voice_id || !getVoice(p.voice_id)) return;
 
     const name = speakerName(message.member);
-    const text = applyDictionary(message.guild.id, name + '、' + message.content.trim());
+    const rawText = p.speak_name_prefix
+      ? name + '、' + message.content.trim()
+      : message.content.trim();
+    const text = applyDictionary(message.guild.id, rawText);
     const accepted = queueMessage(message.guild.id, p.voice_id, text, p.speed, p.volume);
     if (!accepted) console.warn('TTS queue rejected a message in guild ' + message.guild.id);
   } catch (e) {
