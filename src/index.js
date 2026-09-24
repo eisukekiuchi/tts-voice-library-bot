@@ -431,7 +431,9 @@ async function connectChannel(channel) {
 }
 
 async function connectTo(member) {
-  const channel = member.voice && member.voice.channel;
+  const guild = member.guild;
+  const cachedState = guild.voiceStates.cache.get(member.id);
+  const channel = (member.voice && member.voice.channel) || (cachedState && cachedState.channel);
   if (!channel) throw new Error('先にボイスチャンネルへ参加してください。');
   return connectChannel(channel);
 }
@@ -733,7 +735,7 @@ function personalPanel(guildId, userId) {
 }
 
 function householdModal(guildId, userId) {
-  const current = registeredHouseholdName(guildId, userId) || '';
+  const current = registeredHouseholdName(guildId, userId);
   const modal = new ModalBuilder().setCustomId('modal:household').setTitle('家名登録');
   const input = new TextInputBuilder()
     .setCustomId('household_name')
@@ -742,8 +744,9 @@ function householdModal(guildId, userId) {
     .setRequired(true)
     .setMinLength(1)
     .setMaxLength(32)
-    .setValue(current)
     .setStyle(TextInputStyle.Short);
+
+  if (current) input.setValue(current);
 
   modal.addComponents(new ActionRowBuilder().addComponents(input));
   return modal;
@@ -965,6 +968,13 @@ async function showLibrary(interaction, query, favoritesOnly, edit) {
 
 async function previewVoice(interaction, voice, asFile) {
   const p = effectivePrefs(interaction.guildId, interaction.user.id);
+
+  if (!asFile && !isConnected(interaction.guildId)) {
+    const member = await memberFor(interaction);
+    await connectTo(member);
+    await refreshPanel(interaction.guild).catch(() => {});
+  }
+
   const file = await ensureAudio(voice.id, PREVIEW_TEXT, { speed: p.speed, volume: p.volume });
 
   if (asFile) {
@@ -976,9 +986,20 @@ async function previewVoice(interaction, voice, asFile) {
     });
   }
 
-  if (!isConnected(interaction.guildId)) await connectTo(await memberFor(interaction));
   enqueue(interaction.guildId, file, true);
 }
+
+client.on('error', error => {
+  console.error('Discord client error:', error);
+});
+
+process.on('unhandledRejection', reason => {
+  console.error('Unhandled rejection:', reason);
+});
+
+process.on('uncaughtException', error => {
+  console.error('Uncaught exception:', error);
+});
 
 client.once(Events.ClientReady, async ready => {
   console.log('Ready as ' + ready.user.tag);
@@ -1228,8 +1249,13 @@ client.on(Events.InteractionCreate, async interaction => {
       if (action === 'preview') {
         const voice = getVoice(current.voice_id);
         if (!voice) return interaction.reply({ content: '先に声を選んでください。', ephemeral: true });
-        await interaction.deferUpdate();
-        await previewVoice(interaction, voice, false);
+        await interaction.deferReply({ ephemeral: true });
+        try {
+          await previewVoice(interaction, voice, false);
+          await interaction.editReply('🔊 **' + voice.name + (voice.style ? ' / ' + voice.style : '') + '** をVCで試聴しています。');
+        } catch (e) {
+          await interaction.editReply('⚠️ ' + (e.message || '試聴できませんでした。'));
+        }
         return;
       }
 
@@ -1363,8 +1389,17 @@ client.on(Events.InteractionCreate, async interaction => {
       else if (action === 'all') return showLibrary(interaction, '', false, true);
       else if (action === 'favorites') return showLibrary(interaction, '', true, true);
       else if (action === 'preview' || action === 'file') {
-        await interaction.deferUpdate();
-        await previewVoice(interaction, voice, action === 'file');
+        await interaction.deferReply({ ephemeral: true });
+        try {
+          await previewVoice(interaction, voice, action === 'file');
+          if (action === 'preview') {
+            await interaction.editReply('🔊 **' + voice.name + (voice.style ? ' / ' + voice.style : '') + '** をVCで試聴しています。');
+          } else {
+            await interaction.deleteReply().catch(() => {});
+          }
+        } catch (e) {
+          await interaction.editReply('⚠️ ' + (e.message || '試聴できませんでした。'));
+        }
         return;
       }
 
