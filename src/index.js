@@ -719,19 +719,22 @@ function personalPanel(guildId, userId) {
     new ButtonBuilder().setCustomId('personal:fastvoices').setLabel('神速ボイス').setEmoji('⚡').setStyle(ButtonStyle.Success),
     new ButtonBuilder().setCustomId('personal:library').setLabel('全ボイス').setEmoji('🎙️').setStyle(ButtonStyle.Primary),
     new ButtonBuilder().setCustomId('personal:favorites').setLabel('お気に入り').setEmoji('⭐').setStyle(ButtonStyle.Secondary),
-    new ButtonBuilder().setCustomId('personal:search').setLabel('検索').setEmoji('🔎').setStyle(ButtonStyle.Secondary),
-    new ButtonBuilder().setCustomId('personal:preview').setLabel('試聴').setEmoji('🔊').setStyle(ButtonStyle.Secondary)
+    new ButtonBuilder().setCustomId('personal:search').setLabel('検索').setEmoji('🔎').setStyle(ButtonStyle.Secondary)
   );
 
   const row2 = new ActionRowBuilder().addComponents(
+    new ButtonBuilder().setCustomId('personal:preview').setLabel('試聴').setEmoji('🔊').setStyle(ButtonStyle.Secondary),
     new ButtonBuilder().setCustomId('personal:speeddown').setLabel('速度 −').setStyle(ButtonStyle.Secondary),
     new ButtonBuilder().setCustomId('personal:speedup').setLabel('速度 ＋').setStyle(ButtonStyle.Secondary),
     new ButtonBuilder().setCustomId('personal:voldown').setLabel('音量 −').setStyle(ButtonStyle.Secondary),
-    new ButtonBuilder().setCustomId('personal:volup').setLabel('音量 ＋').setStyle(ButtonStyle.Secondary),
+    new ButtonBuilder().setCustomId('personal:volup').setLabel('音量 ＋').setStyle(ButtonStyle.Secondary)
+  );
+
+  const row3 = new ActionRowBuilder().addComponents(
     new ButtonBuilder().setCustomId('personal:reset').setLabel('既定値に戻す').setStyle(ButtonStyle.Danger)
   );
 
-  return { embeds: [embed], components: [row1, row2] };
+  return { embeds: [embed], components: [row1, row2, row3] };
 }
 
 function householdModal(guildId, userId) {
