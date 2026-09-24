@@ -341,7 +341,7 @@ const audioStates = new Map();
 
 function audioState(guildId) {
   if (!audioStates.has(guildId)) {
-    const player = createAudioPlayer({ behaviors: { noSubscriber: NoSubscriberBehavior.Pause } });
+    const player = createAudioPlayer({ behaviors: { noSubscriber: NoSubscriberBehavior.Play } });
     const s = {
       connection: null,
       player,
@@ -352,6 +352,15 @@ function audioState(guildId) {
       speakingUsers: new Set(),
       duckReleaseTimer: null
     };
+    player.on(AudioPlayerStatus.Playing, () => {
+      console.log('[VOICE] player playing guild=' + guildId);
+    });
+    player.on(AudioPlayerStatus.Paused, () => {
+      console.log('[VOICE] player paused guild=' + guildId);
+    });
+    player.on(AudioPlayerStatus.AutoPaused, () => {
+      console.log('[VOICE] player auto-paused guild=' + guildId);
+    });
     player.on(AudioPlayerStatus.Idle, () => {
       s.playing = false;
       s.currentResource = null;
@@ -427,6 +436,7 @@ async function connectChannel(channel) {
   connection.subscribe(s.player);
   bindSpeakingDucking(channel.guild, connection);
   await entersState(connection, VoiceConnectionStatus.Ready, 15000);
+  console.log('[VOICE] connected guild=' + channel.guild.id + ' channel=' + channel.id);
   return channel;
 }
 
@@ -484,7 +494,15 @@ function enqueue(guildId, file, interrupt) {
 
   if (interrupt) {
     s.queue.unshift(file);
-    s.player.stop(true);
+
+    if (s.playing) {
+      // 再生中なら現在の音声を止める。Idleイベントから次の試聴を即再生。
+      s.player.stop(true);
+    } else {
+      // 待機中に stop() だけ呼んでも Idle イベントは発火しないため、
+      // 明示的に再生開始する。
+      playNext(guildId).catch(console.error);
+    }
     return true;
   }
 
