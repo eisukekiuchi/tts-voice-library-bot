@@ -47,6 +47,8 @@ const SYNTH_CONCURRENCY = Math.max(1, Number(process.env.TTS_SYNTH_CONCURRENCY |
 const MAX_PENDING_MESSAGES = Math.max(10, Number(process.env.TTS_MAX_PENDING_MESSAGES || 500));
 const MAX_AUDIO_QUEUE = Math.max(100, Number(process.env.TTS_MAX_AUDIO_QUEUE || 3000));
 const REQUEST_TIMEOUT_MS = Math.max(2000, Number(process.env.TTS_REQUEST_TIMEOUT_MS || 20000));
+const DUCK_VOLUME = Math.max(0.05, Math.min(1, Number(process.env.TTS_DUCK_VOLUME || 0.22)));
+const DUCK_RELEASE_MS = Math.max(0, Number(process.env.TTS_DUCK_RELEASE_MS || 350));
 
 fs.mkdirSync(DATA_DIR, { recursive: true });
 fs.mkdirSync(CACHE_DIR, { recursive: true });
@@ -117,6 +119,7 @@ function userPrefs(guildId, userId) {
   const key = userKey(guildId, userId);
   if (!state.users[key]) {
     state.users[key] = {
+      household_name: null,
       voice_id: null,
       speed: null,
       volume: null
@@ -131,6 +134,20 @@ function patchUser(guildId, userId, patch) {
   Object.assign(p, patch);
   saveStateSoon();
   return p;
+}
+
+function registeredHouseholdName(guildId, userId) {
+  const value = userPrefs(guildId, userId).household_name;
+  return typeof value === 'string' && value.trim() ? value.trim() : null;
+}
+
+function speakerName(member) {
+  if (!member) return 'ユーザー';
+  return registeredHouseholdName(member.guild.id, member.id)
+    || member.displayName
+    || member.user.globalName
+    || member.user.username
+    || 'ユーザー';
 }
 
 function effectivePrefs(guildId, userId) {
@@ -325,19 +342,66 @@ const audioStates = new Map();
 function audioState(guildId) {
   if (!audioStates.has(guildId)) {
     const player = createAudioPlayer({ behaviors: { noSubscriber: NoSubscriberBehavior.Pause } });
-    const s = { connection: null, player, queue: [], playing: false, dropped: 0 };
+    const s = {
+      connection: null,
+      player,
+      queue: [],
+      playing: false,
+      dropped: 0,
+      currentResource: null,
+      speakingUsers: new Set(),
+      duckReleaseTimer: null
+    };
     player.on(AudioPlayerStatus.Idle, () => {
       s.playing = false;
+      s.currentResource = null;
       playNext(guildId).catch(console.error);
     });
     player.on('error', err => {
       console.error('Audio player error:', err);
       s.playing = false;
+      s.currentResource = null;
       playNext(guildId).catch(console.error);
     });
     audioStates.set(guildId, s);
   }
   return audioStates.get(guildId);
+}
+
+function applyDuckState(guildId) {
+  const s = audioState(guildId);
+  if (!s.currentResource || !s.currentResource.volume) return;
+  const ducked = s.speakingUsers.size > 0;
+  s.currentResource.volume.setVolume(ducked ? DUCK_VOLUME : 1);
+}
+
+function bindSpeakingDucking(guild, connection) {
+  const s = audioState(guild.id);
+  s.speakingUsers.clear();
+
+  connection.receiver.speaking.on('start', userId => {
+    const member = guild.members.cache.get(userId);
+    if (member && member.user.bot) return;
+
+    if (s.duckReleaseTimer) {
+      clearTimeout(s.duckReleaseTimer);
+      s.duckReleaseTimer = null;
+    }
+
+    s.speakingUsers.add(userId);
+    applyDuckState(guild.id);
+  });
+
+  connection.receiver.speaking.on('end', userId => {
+    s.speakingUsers.delete(userId);
+    if (s.speakingUsers.size > 0) return;
+
+    if (s.duckReleaseTimer) clearTimeout(s.duckReleaseTimer);
+    s.duckReleaseTimer = setTimeout(() => {
+      s.duckReleaseTimer = null;
+      if (s.speakingUsers.size === 0) applyDuckState(guild.id);
+    }, DUCK_RELEASE_MS);
+  });
 }
 
 async function connectChannel(channel) {
@@ -361,6 +425,7 @@ async function connectChannel(channel) {
 
   s.connection = connection;
   connection.subscribe(s.player);
+  bindSpeakingDucking(channel.guild, connection);
   await entersState(connection, VoiceConnectionStatus.Ready, 15000);
   return channel;
 }
@@ -395,6 +460,12 @@ function disconnect(guildId) {
   const s = audioState(guildId);
   s.queue = [];
   s.player.stop(true);
+  if (s.duckReleaseTimer) {
+    clearTimeout(s.duckReleaseTimer);
+    s.duckReleaseTimer = null;
+  }
+  s.speakingUsers.clear();
+  s.currentResource = null;
   if (s.connection) {
     try { s.connection.destroy(); } catch {}
     s.connection = null;
@@ -431,7 +502,12 @@ async function playNext(guildId) {
   const next = s.queue.shift();
   if (!next) return;
   s.playing = true;
-  s.player.play(createAudioResource(next));
+  const resource = createAudioResource(next, { inlineVolume: true });
+  s.currentResource = resource;
+  if (resource.volume) {
+    resource.volume.setVolume(s.speakingUsers.size > 0 ? DUCK_VOLUME : 1);
+  }
+  s.player.play(resource);
 }
 
 function skip(guildId) {
@@ -629,6 +705,7 @@ function personalPanel(guildId, userId) {
     .setTitle('👤 自分用BOT設定')
     .setDescription('この画面はあなたにしか見えません。あなたの発言だけに適用されます。')
     .addFields(
+      { name: '家名', value: registeredHouseholdName(guildId, userId) || '未登録（サーバー表示名を使用）', inline: false },
       { name: '自分の声', value: voice ? voice.name + (voice.style ? ' / ' + voice.style : '') : '未選択', inline: false },
       { name: '速度', value: Number(p.speed).toFixed(2) + 'x', inline: true },
       { name: '音量', value: Math.round(Number(p.volume) * 100) + '%', inline: true },
@@ -636,6 +713,7 @@ function personalPanel(guildId, userId) {
     );
 
   const row1 = new ActionRowBuilder().addComponents(
+    new ButtonBuilder().setCustomId('personal:household').setLabel('家名登録・変更').setEmoji('🏷️').setStyle(ButtonStyle.Primary),
     new ButtonBuilder().setCustomId('personal:fastvoices').setLabel('神速ボイス').setEmoji('⚡').setStyle(ButtonStyle.Success),
     new ButtonBuilder().setCustomId('personal:library').setLabel('全ボイス').setEmoji('🎙️').setStyle(ButtonStyle.Primary),
     new ButtonBuilder().setCustomId('personal:favorites').setLabel('お気に入り').setEmoji('⭐').setStyle(ButtonStyle.Secondary),
@@ -652,6 +730,23 @@ function personalPanel(guildId, userId) {
   );
 
   return { embeds: [embed], components: [row1, row2] };
+}
+
+function householdModal(guildId, userId) {
+  const current = registeredHouseholdName(guildId, userId) || '';
+  const modal = new ModalBuilder().setCustomId('modal:household').setTitle('家名登録');
+  const input = new TextInputBuilder()
+    .setCustomId('household_name')
+    .setLabel('家名')
+    .setPlaceholder('例：木内家')
+    .setRequired(true)
+    .setMinLength(1)
+    .setMaxLength(32)
+    .setValue(current)
+    .setStyle(TextInputStyle.Short);
+
+  modal.addComponents(new ActionRowBuilder().addComponents(input));
+  return modal;
 }
 
 function searchModal() {
@@ -999,6 +1094,16 @@ client.on(Events.InteractionCreate, async interaction => {
     }
 
     if (interaction.isModalSubmit()) {
+      if (interaction.customId === 'modal:household') {
+        const value = interaction.fields.getTextInputValue('household_name').trim();
+        if (!value) return interaction.reply({ content: '家名を入力してください。', ephemeral: true });
+        patchUser(interaction.guildId, interaction.user.id, { household_name: value });
+        return interaction.reply(Object.assign(
+          { content: '✅ 家名を **' + value + '** に登録しました。', ephemeral: true },
+          personalPanel(interaction.guildId, interaction.user.id)
+        ));
+      }
+
       if (interaction.customId === 'modal:search') {
         const q = interaction.fields.getTextInputValue('query').trim();
         return showLibrary(interaction, q, false, false);
@@ -1104,6 +1209,9 @@ client.on(Events.InteractionCreate, async interaction => {
     if (interaction.customId === 'voice:empty:search') return interaction.showModal(searchModal());
 
     if (interaction.customId === 'settings:open') {
+      if (!registeredHouseholdName(interaction.guildId, interaction.user.id)) {
+        return interaction.showModal(householdModal(interaction.guildId, interaction.user.id));
+      }
       return interaction.reply(Object.assign({}, personalPanel(interaction.guildId, interaction.user.id), { ephemeral: true }));
     }
 
@@ -1111,6 +1219,7 @@ client.on(Events.InteractionCreate, async interaction => {
       const action = interaction.customId.split(':')[1];
       const current = effectivePrefs(interaction.guildId, interaction.user.id);
 
+      if (action === 'household') return interaction.showModal(householdModal(interaction.guildId, interaction.user.id));
       if (action === 'fastvoices') return showLibrary(interaction, 'VOICEVOX 神速', false, false);
       if (action === 'library') return showLibrary(interaction, '', false, false);
       if (action === 'favorites') return showLibrary(interaction, '', true, false);
@@ -1272,6 +1381,17 @@ client.on(Events.InteractionCreate, async interaction => {
   }
 });
 
+async function announceVoiceJoin(member, channel) {
+  if (!member || !channel || member.user.bot) return;
+  if (connectedChannelId(member.guild.id) !== channel.id) return;
+
+  const p = effectivePrefs(member.guild.id, member.id);
+  if (!p.voice_id || !getVoice(p.voice_id)) return;
+
+  const name = speakerName(member);
+  queueMessage(member.guild.id, p.voice_id, name + 'さんが参加しました。', p.speed, p.volume);
+}
+
 client.on(Events.VoiceStateUpdate, async (oldState, newState) => {
   try {
     const guild = newState.guild || oldState.guild;
@@ -1290,12 +1410,16 @@ client.on(Events.VoiceStateUpdate, async (oldState, newState) => {
         await connectChannel(joinedChannel);
         await refreshPanel(guild);
         await ensureSettingsLauncher(guild);
-      } else if (currentId !== joinedChannel.id) {
+        await announceVoiceJoin(member, joinedChannel);
+      } else if (currentId === joinedChannel.id) {
+        await announceVoiceJoin(member, joinedChannel);
+      } else {
         const current = guild.channels.cache.get(currentId);
         if (!current || humanMembers(current).length === 0) {
           await connectChannel(joinedChannel);
           await refreshPanel(guild);
           await ensureSettingsLauncher(guild);
+          await announceVoiceJoin(member, joinedChannel);
         }
       }
     }
@@ -1333,7 +1457,8 @@ client.on(Events.MessageCreate, message => {
     const p = effectivePrefs(message.guild.id, message.author.id);
     if (!p.voice_id || !getVoice(p.voice_id)) return;
 
-    const text = applyDictionary(message.guild.id, message.content.trim());
+    const name = speakerName(message.member);
+    const text = applyDictionary(message.guild.id, name + '、' + message.content.trim());
     const accepted = queueMessage(message.guild.id, p.voice_id, text, p.speed, p.volume);
     if (!accepted) console.warn('TTS queue rejected a message in guild ' + message.guild.id);
   } catch (e) {
