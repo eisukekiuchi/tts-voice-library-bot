@@ -154,11 +154,18 @@ function registeredHouseholdName(guildId, userId) {
 
 function speakerName(member) {
   if (!member) return 'ユーザー';
-  return registeredHouseholdName(member.guild.id, member.id)
-    || member.displayName
-    || member.user.globalName
-    || member.user.username
-    || 'ユーザー';
+  const household = registeredHouseholdName(member.guild.id, member.id);
+  if (household) return household;
+
+  // 家名が未登録なら、参加先サーバーのニックネームを優先する。
+  // ニックネームがなければDiscordの表示名・ユーザー名へフォールバック。
+  const names = [
+    member.nickname,
+    member.displayName,
+    member.user && member.user.globalName,
+    member.user && member.user.username
+  ];
+  return names.find(name => typeof name === 'string' && name.trim())?.trim() || 'ユーザー';
 }
 
 function effectivePrefs(guildId, userId) {
