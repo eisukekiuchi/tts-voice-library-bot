@@ -1548,7 +1548,11 @@ async function announceVoiceJoin(member, channel) {
   const p = effectivePrefs(member.guild.id, member.id);
   if (!p.voice_id || !getVoice(p.voice_id)) return;
 
-  const name = speakerName(member);
+  // VC入室通知ではギルド識別タグを読み上げない。
+  const name = speakerName(member)
+    .replace(/[（(]\s*(?:VG|EG)\s*[)）]/gi, ' ')
+    .replace(/\s+/g, ' ')
+    .trim() || 'ユーザー';
   queueMessage(member.guild.id, p.voice_id, name + 'さんがVCに入室しました。', p.speed, p.volume);
 }
 
