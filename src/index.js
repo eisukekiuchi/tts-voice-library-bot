@@ -163,10 +163,9 @@ function effectivePrefs(guildId, userId) {
   // ユーザーごとに安定した擬似ランダムなデフォルトを割り当てる。
   // 個人設定の voice_id がある場合は必ずそちらを優先する。
   const defaultNames = ['猫使ビィ', '櫻歌ミコ', 'もち子さん', '春日部つむぎ', 'ずんだもん', '四国めたん', 'コハク', 'まお'];
-  const candidates = defaultNames.map(name => {
-    const matches = available.filter(v => v.name === name);
-    return matches.find(v => /^(ノーマル|普通|normal)$/i.test(v.style || '')) || matches[0];
-  }).filter(Boolean);
+  const candidates = defaultNames.map(name =>
+    available.find(v => v.name === name && /^(ノーマル|普通|normal)$/i.test(v.style || ''))
+  ).filter(Boolean);
   const hash = crypto.createHash('sha256').update(userKey(guildId, userId)).digest();
   const assignedVoice = candidates.length ? candidates[hash.readUInt32BE(0) % candidates.length] : null;
   return {
