@@ -142,7 +142,14 @@ function patchUser(guildId, userId, patch) {
 
 function registeredHouseholdName(guildId, userId) {
   const value = userPrefs(guildId, userId).household_name;
-  return typeof value === 'string' && value.trim() ? value.trim() : null;
+  if (typeof value === 'string' && value.trim()) return value.trim();
+  // Reuse the user's registered household name from another guild.
+  for (const [key, prefs] of Object.entries(state.users)) {
+    if (key.endsWith(':' + userId) && typeof prefs.household_name === 'string' && prefs.household_name.trim()) {
+      return prefs.household_name.trim();
+    }
+  }
+  return null;
 }
 
 function speakerName(member) {
