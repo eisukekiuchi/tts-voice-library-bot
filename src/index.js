@@ -159,8 +159,18 @@ function effectivePrefs(guildId, userId) {
   const p = userPrefs(guildId, userId);
   const available = Object.values(state.voices).filter(v => v.enabled !== false);
   const fastVoice = available.find(v => v.engine_id === 'voicevox-fast') || available[0];
+  // 個人で声を選んでいないメンバーには、指定された8キャラクターから
+  // ユーザーごとに安定した擬似ランダムなデフォルトを割り当てる。
+  // 個人設定の voice_id がある場合は必ずそちらを優先する。
+  const defaultNames = ['猫使ビィ', '櫻歌ミコ', 'もち子さん', '春日部つむぎ', 'ずんだもん', '四国めたん', 'コハク', 'まお'];
+  const candidates = defaultNames.map(name => {
+    const matches = available.filter(v => v.name === name);
+    return matches.find(v => /^(ノーマル|普通|normal)$/i.test(v.style || '')) || matches[0];
+  }).filter(Boolean);
+  const hash = crypto.createHash('sha256').update(userKey(guildId, userId)).digest();
+  const assignedVoice = candidates.length ? candidates[hash.readUInt32BE(0) % candidates.length] : null;
   return {
-    voice_id: p.voice_id || g.voice_id || (fastVoice ? fastVoice.id : null),
+    voice_id: p.voice_id || (assignedVoice && assignedVoice.id) || g.voice_id || (fastVoice ? fastVoice.id : null),
     speed: p.speed == null ? Number(g.speed || 1) : Number(p.speed),
     volume: p.volume == null ? Number(g.volume || 1) : Number(p.volume),
     speak_name_prefix: p.speak_name_prefix !== false
