@@ -5,6 +5,7 @@ const fsp = require('fs/promises');
 const path = require('path');
 const http = require('http');
 const crypto = require('crypto');
+const { composeChatMessage, dictionaryStats } = require('./text-normalizer');
 
 const {
   Client,
@@ -209,13 +210,6 @@ function getVoice(id) {
 function dictFor(guildId) {
   if (!state.dictionaries[guildId]) state.dictionaries[guildId] = {};
   return state.dictionaries[guildId];
-}
-
-function applyDictionary(guildId, text) {
-  let out = String(text || '');
-  const rows = Object.entries(dictFor(guildId)).sort((a, b) => b[0].length - a[0].length);
-  for (const row of rows) out = out.split(row[0]).join(row[1]);
-  return out;
 }
 
 function parseEngines() {
@@ -652,8 +646,11 @@ function cutNatural(text, limit) {
   return cut > 0 ? cut : limit;
 }
 
-function splitText(input) {
-  let text = cleanText(input);
+function splitText(input, options = {}) {
+  // Chat messages were already protected and normalized before the name prefix
+  // was attached. Do not run their custom readings or inline code through a
+  // second cleanup pass. Announcements retain their existing cleanup path.
+  let text = options.prepared ? String(input || '').trim().slice(0, MAX_TEXT_CHARS) : cleanText(input);
   const out = [];
   let first = true;
 
@@ -674,14 +671,14 @@ function splitText(input) {
   return out;
 }
 
-function queueMessage(guildId, voiceId, text, speed, volume) {
+function queueMessage(guildId, voiceId, text, speed, volume, options = {}) {
   const g = pipelineGuild(guildId);
   if (g.pending >= MAX_PENDING_MESSAGES) {
     g.rejected++;
     return false;
   }
 
-  const chunks = splitText(text);
+  const chunks = splitText(text, options);
   if (!chunks.length) return false;
 
   g.pending++;
@@ -1462,8 +1459,18 @@ client.on(Events.InteractionCreate, async interaction => {
 
       if (action === 'dictlist') {
         const rows = Object.entries(dictFor(interaction.guildId));
-        const txt = rows.length ? rows.slice(0, 80).map(x => '• **' + x[0] + '** → ' + x[1]).join('\n') : '辞書は空です。';
-        return interaction.reply({ content: '📚 **読み上げ辞書**\n' + txt, ephemeral: true });
+        const stats = dictionaryStats();
+        const header = '📚 **読み上げ辞書**\n標準辞書：' + stats.entries + '件＋笑い・拍手のルール\n個別登録を優先します。黒い砂漠の職略称は文脈に合わせて読みます。\n\n**このサーバーの個別登録**\n';
+        const lines = rows.map(x => '• **' + x[0] + '** → ' + x[1]);
+        let txt = rows.length ? '' : '個別登録はありません。標準辞書は有効です。';
+        let shown = 0;
+        for (const line of lines) {
+          if (header.length + txt.length + line.length > 1800) break;
+          txt += line + '\n';
+          shown++;
+        }
+        if (shown < rows.length) txt += 'ほか ' + (rows.length - shown) + ' 件';
+        return interaction.reply({ content: header + txt, ephemeral: true });
       }
 
       if (action === 'duckdown' || action === 'duckup') {
@@ -1611,11 +1618,15 @@ client.on(Events.MessageCreate, message => {
     if (!p.voice_id || !getVoice(p.voice_id)) return;
 
     const name = speakerName(message.member);
-    const rawText = p.speak_name_prefix
-      ? name + '、' + message.content.trim()
-      : message.content.trim();
-    const text = applyDictionary(message.guild.id, rawText);
-    const accepted = queueMessage(message.guild.id, p.voice_id, text, p.speed, p.volume);
+    const text = composeChatMessage({
+      content: message.content,
+      speaker: name,
+      speakName: p.speak_name_prefix,
+      dictionary: dictFor(message.guild.id),
+      profile: process.env.TTS_READING_PROFILE || 'auto',
+      maxLength: MAX_TEXT_CHARS
+    });
+    const accepted = queueMessage(message.guild.id, p.voice_id, text, p.speed, p.volume, { prepared: true });
     if (!accepted) console.warn('TTS queue rejected a message in guild ' + message.guild.id);
   } catch (e) {
     console.error('Message TTS error:', e);
@@ -1630,7 +1641,8 @@ const server = http.createServer((req, res) => {
       discordReady: client.isReady(),
       bot: client.user ? client.user.tag : null,
       engines: engines.map(e => e.label),
-      voices: Object.keys(state.voices).length
+      voices: Object.keys(state.voices).length,
+      readingDictionary: dictionaryStats()
     };
     res.writeHead(200, { 'content-type': 'application/json; charset=utf-8' });
     return res.end(JSON.stringify(payload));
@@ -1642,6 +1654,8 @@ const server = http.createServer((req, res) => {
 
 server.listen(PORT, '0.0.0.0', () => {
   console.log('Health server listening on :' + PORT);
+  const stats = dictionaryStats();
+  console.log('[READINGS] version=' + stats.version + ' entries=' + stats.entries + ' profile=' + (process.env.TTS_READING_PROFILE || 'auto'));
 });
 
 if (process.env.DISCORD_TOKEN) {

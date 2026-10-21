@@ -1,11 +1,12 @@
 {
   "name": "tts-voice-library-bot",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "private": true,
   "description": "Button-only Discord TTS voice library bot for Railway",
   "main": "src/index.js",
   "scripts": {
-    "start": "node src/index.js"
+    "start": "node src/index.js",
+    "test": "node --test test/*.test.js"
   },
   "engines": {
     "node": ">=22.12.0"

@@ -1,0 +1,2861 @@
+{
+  "version": "2026-10-21",
+  "sources": {
+    "jcg": {
+      "url": "https://jcg.co.jp/journal/journal-13908",
+      "note": "Esports organizer glossary; acronym meanings and some spoken expansions. Letter-name readings below are implementation choices."
+    },
+    "hatosan": {
+      "url": "https://www.hatosan.com/utc/nsg.html",
+      "note": "Author compiled internet/chat glossary; meanings and usage contexts, not every kana reading."
+    },
+    "quizcastle": {
+      "url": "https://jp.quizcastle.com/dictionary/6r170pdk3x",
+      "note": "Selected Japanese slang terms and explicit readings; curated individual facts, not wholesale dictionary copy."
+    },
+    "typing": {
+      "url": "https://typing.twi1.me/game/28",
+      "note": "Author-created typing exercise with explicit term/kana pairs. Exclude deliberate misreadings of normal words."
+    },
+    "pso": {
+      "url": "https://www.psohaven.com/ja/guide/acronym.html",
+      "note": "Game chat abbreviation meanings; kana transliterations below are proposed speech style."
+    },
+    "up": {
+      "url": "https://biz.trans-suite.jp/91260",
+      "note": "うp and うp主 reading variants and related terms."
+    },
+    "bdo_class_names": {
+      "url": "https://www.jp.playblackdesert.com/ja-JP/GameInfo/Class/Main",
+      "note": "現在の32クラスの正式名称。略称や全ての読み仮名はここには記載なし。"
+    },
+    "bdo_classes_2022": {
+      "url": "https://www.jp.playblackdesert.com/ja-JP/News/Detail?countryType=ja-JP&groupContentNo=5439",
+      "note": "WR〜DRの24クラス名と公式商品コードの対応表。"
+    },
+    "bdo_classes_2025": {
+      "url": "https://www.jp.playblackdesert.com/ja-JP/News/Detail?countryType=ja-JP&groupContentNo=10048",
+      "note": "WS/MG/SC/DS/DEを含む公式クラスコード。"
+    },
+    "bdo_wk": {
+      "url": "https://www.jp.playblackdesert.com/ja-JP/News/Detail?groupContentNo=10579",
+      "note": "ウーコンとWK解放依頼の対応。"
+    },
+    "bdo_sp": {
+      "url": "https://www.jp.playblackdesert.com/ja-jp/News/Detail?countryType=ja-jp&groupContentNo=11310",
+      "note": "セラフィムとSP解放依頼の対応。SP単独はスキルポイントとも衝突。"
+    },
+    "bdo_ag": {
+      "url": "https://www.jp.playblackdesert.com/ja-JP/News/Detail?groupContentNo=12542",
+      "note": "エージェント攻略ガイドの伝承AG表記。"
+    },
+    "bdo_pvp": {
+      "url": "https://www.jp.playblackdesert.com/ja-jp/Wiki?wikiNo=58",
+      "note": "PvP、状態異常、防御判定、能力値、拠点戦等の用語。"
+    },
+    "bdo_solare": {
+      "url": "https://www.jp.playblackdesert.com/ja-JP/News/Detail?countryType=ja-JP&groupContentNo=11999",
+      "note": "CC、HP、前方ガード、緊急回避など。"
+    },
+    "bdo_nodewar": {
+      "url": "https://www.jp.playblackdesert.com/ja-JP/Wiki?wikiNo=329",
+      "note": "拠点戦の施設名、役職、地域名など。"
+    },
+    "bdo_blue": {
+      "url": "https://www.jp.playblackdesert.com/ja-JP/Wiki?wikiNo=416",
+      "note": "青の戦場、重帆船、艦砲等の海戦用語。"
+    },
+    "bdo_glossary": {
+      "url": "https://www.jp.playblackdesert.com/ja-JP/Forum/ForumTopic/Detail?_opinionNo=0&_topicNo=1267",
+      "note": "プレイヤー投稿のSA/FG/CT/CCと略称用例。検索結果は取得できたが本文はWAFでアクセス不可。公式運営監修の辞書ではない。"
+    },
+    "riot_chat": {
+      "url": "https://playvalorant.com/ja-jp/news/game-updates/valorant-patch-notes-13-08/",
+      "note": "AFK=離席行為、GL HF GGの使用。"
+    },
+    "discord_dm": {
+      "url": "https://discord.com/safety-library",
+      "note": "DM/GDMの用語と意味。"
+    },
+    "unicode_cldr_ja": {
+      "url": "https://github.com/unicode-org/cldr-json/blob/main/cldr-json/cldr-annotations-full/annotations/ja/annotations.json",
+      "note": "Unicode CLDR Japanese emoji short-name reference, fetched 2026-10-21. Selected conventional emoji labels informed these independently curated kana utterances; kana pronunciation is an editorial rendering of the label, not a unique required spoken interpretation. Unicode CLDR is distributed under Unicode License v3: https://www.unicode.org/license.txt."
+    }
+  },
+  "entries": [
+    {
+      "term": "AC",
+      "reading": "アーチャー",
+      "category": "bdo_class",
+      "match": "class",
+      "caseSensitive": true,
+      "sourceIds": [
+        "bdo_classes_2022",
+        "bdo_class_names"
+      ],
+      "evidence": "reading_attested"
+    },
+    {
+      "term": "AG",
+      "reading": "エージェント",
+      "category": "bdo_class",
+      "match": "class",
+      "caseSensitive": true,
+      "sourceIds": [
+        "bdo_ag",
+        "bdo_class_names"
+      ],
+      "evidence": "reading_attested"
+    },
+    {
+      "term": "BD",
+      "reading": "ブレイダー",
+      "category": "bdo_class",
+      "match": "class",
+      "caseSensitive": true,
+      "sourceIds": [
+        "bdo_classes_2022",
+        "bdo_class_names"
+      ],
+      "evidence": "reading_attested"
+    },
+    {
+      "term": "CO",
+      "reading": "コルセア",
+      "category": "bdo_class",
+      "match": "class",
+      "caseSensitive": true,
+      "sourceIds": [
+        "bdo_classes_2022",
+        "bdo_class_names"
+      ],
+      "evidence": "reading_attested"
+    },
+    {
+      "term": "DE",
+      "reading": "デッドアイ",
+      "category": "bdo_class",
+      "match": "class",
+      "caseSensitive": true,
+      "sourceIds": [
+        "bdo_classes_2025",
+        "bdo_class_names"
+      ],
+      "evidence": "reading_attested"
+    },
+    {
+      "term": "DK",
+      "reading": "ダークナイト",
+      "category": "bdo_class",
+      "match": "class",
+      "caseSensitive": true,
+      "sourceIds": [
+        "bdo_classes_2022",
+        "bdo_class_names"
+      ],
+      "evidence": "reading_attested"
+    },
+    {
+      "term": "DR",
+      "reading": "ドラカニア",
+      "category": "bdo_class",
+      "match": "class",
+      "caseSensitive": true,
+      "sourceIds": [
+        "bdo_classes_2022",
+        "bdo_class_names"
+      ],
+      "evidence": "reading_attested"
+    },
+    {
+      "term": "DS",
+      "reading": "ドーサ",
+      "category": "bdo_class",
+      "match": "class",
+      "caseSensitive": true,
+      "sourceIds": [
+        "bdo_classes_2025",
+        "bdo_class_names"
+      ],
+      "evidence": "reading_attested"
+    },
+    {
+      "term": "GA",
+      "reading": "ジャイアント",
+      "category": "bdo_class",
+      "match": "class",
+      "caseSensitive": true,
+      "sourceIds": [
+        "bdo_classes_2022",
+        "bdo_class_names"
+      ],
+      "evidence": "reading_attested"
+    },
+    {
+      "term": "GD",
+      "reading": "ガーディアン",
+      "category": "bdo_class",
+      "match": "class",
+      "caseSensitive": true,
+      "sourceIds": [
+        "bdo_classes_2022",
+        "bdo_class_names"
+      ],
+      "evidence": "reading_attested"
+    },
+    {
+      "term": "HS",
+      "reading": "ハサシン",
+      "category": "bdo_class",
+      "match": "class",
+      "caseSensitive": true,
+      "sourceIds": [
+        "bdo_classes_2022",
+        "bdo_class_names"
+      ],
+      "evidence": "reading_attested"
+    },
+    {
+      "term": "KN",
+      "reading": "クノイチ",
+      "category": "bdo_class",
+      "match": "class",
+      "caseSensitive": true,
+      "sourceIds": [
+        "bdo_classes_2022",
+        "bdo_class_names"
+      ],
+      "evidence": "term_attested_reading_selected"
+    },
+    {
+      "term": "KT",
+      "reading": "カクトウカ",
+      "category": "bdo_class",
+      "match": "class",
+      "caseSensitive": true,
+      "sourceIds": [
+        "bdo_classes_2022",
+        "bdo_class_names"
+      ],
+      "evidence": "term_attested_reading_selected"
+    },
+    {
+      "term": "LN",
+      "reading": "ラン",
+      "category": "bdo_class",
+      "match": "class",
+      "caseSensitive": true,
+      "sourceIds": [
+        "bdo_classes_2022",
+        "bdo_class_names"
+      ],
+      "evidence": "reading_attested"
+    },
+    {
+      "term": "LS",
+      "reading": "リトルサマナー",
+      "category": "bdo_class",
+      "match": "class",
+      "caseSensitive": true,
+      "sourceIds": [
+        "bdo_classes_2022",
+        "bdo_class_names"
+      ],
+      "evidence": "reading_attested"
+    },
+    {
+      "term": "MG",
+      "reading": "メグ",
+      "category": "bdo_class",
+      "match": "class",
+      "caseSensitive": true,
+      "sourceIds": [
+        "bdo_classes_2025",
+        "bdo_class_names"
+      ],
+      "evidence": "reading_attested"
+    },
+    {
+      "term": "MT",
+      "reading": "ミスティック",
+      "category": "bdo_class",
+      "match": "class",
+      "caseSensitive": true,
+      "sourceIds": [
+        "bdo_classes_2022",
+        "bdo_class_names"
+      ],
+      "evidence": "reading_attested"
+    },
+    {
+      "term": "NJ",
+      "reading": "ニンジャ",
+      "category": "bdo_class",
+      "match": "class",
+      "caseSensitive": true,
+      "sourceIds": [
+        "bdo_classes_2022",
+        "bdo_class_names"
+      ],
+      "evidence": "term_attested_reading_selected"
+    },
+    {
+      "term": "NV",
+      "reading": "ノヴァ",
+      "category": "bdo_class",
+      "match": "class",
+      "caseSensitive": true,
+      "sourceIds": [
+        "bdo_classes_2022",
+        "bdo_class_names"
+      ],
+      "evidence": "reading_attested"
+    },
+    {
+      "term": "RG",
+      "reading": "レンジャー",
+      "category": "bdo_class",
+      "match": "class",
+      "caseSensitive": true,
+      "sourceIds": [
+        "bdo_classes_2022",
+        "bdo_class_names"
+      ],
+      "evidence": "reading_attested"
+    },
+    {
+      "term": "SC",
+      "reading": "スカラー",
+      "category": "bdo_class",
+      "match": "class",
+      "caseSensitive": true,
+      "sourceIds": [
+        "bdo_classes_2025",
+        "bdo_class_names"
+      ],
+      "evidence": "reading_attested"
+    },
+    {
+      "term": "SG",
+      "reading": "セージ",
+      "category": "bdo_class",
+      "match": "class",
+      "caseSensitive": true,
+      "sourceIds": [
+        "bdo_classes_2022",
+        "bdo_class_names"
+      ],
+      "evidence": "reading_attested"
+    },
+    {
+      "term": "SH",
+      "reading": "シャイ",
+      "category": "bdo_class",
+      "match": "class",
+      "caseSensitive": true,
+      "sourceIds": [
+        "bdo_classes_2022",
+        "bdo_class_names"
+      ],
+      "evidence": "reading_attested"
+    },
+    {
+      "term": "SP",
+      "reading": "セラフィム",
+      "category": "bdo_class",
+      "match": "class",
+      "caseSensitive": true,
+      "sourceIds": [
+        "bdo_sp",
+        "bdo_class_names"
+      ],
+      "evidence": "reading_attested"
+    },
+    {
+      "term": "SR",
+      "reading": "ソーサレス",
+      "category": "bdo_class",
+      "match": "class",
+      "caseSensitive": true,
+      "sourceIds": [
+        "bdo_classes_2022",
+        "bdo_class_names"
+      ],
+      "evidence": "reading_attested"
+    },
+    {
+      "term": "TB",
+      "reading": "ツバキ",
+      "category": "bdo_class",
+      "match": "class",
+      "caseSensitive": true,
+      "sourceIds": [
+        "bdo_classes_2022",
+        "bdo_class_names"
+      ],
+      "evidence": "reading_attested"
+    },
+    {
+      "term": "VK",
+      "reading": "ヴァルキリー",
+      "category": "bdo_class",
+      "match": "class",
+      "caseSensitive": true,
+      "sourceIds": [
+        "bdo_classes_2022",
+        "bdo_class_names"
+      ],
+      "evidence": "reading_attested"
+    },
+    {
+      "term": "WK",
+      "reading": "ウーコン",
+      "category": "bdo_class",
+      "match": "class",
+      "caseSensitive": true,
+      "sourceIds": [
+        "bdo_wk",
+        "bdo_class_names"
+      ],
+      "evidence": "reading_attested"
+    },
+    {
+      "term": "WR",
+      "reading": "ウォーリア",
+      "category": "bdo_class",
+      "match": "class",
+      "caseSensitive": true,
+      "sourceIds": [
+        "bdo_classes_2022",
+        "bdo_class_names"
+      ],
+      "evidence": "reading_attested"
+    },
+    {
+      "term": "WS",
+      "reading": "ウサ",
+      "category": "bdo_class",
+      "match": "class",
+      "caseSensitive": true,
+      "sourceIds": [
+        "bdo_classes_2025",
+        "bdo_class_names"
+      ],
+      "evidence": "reading_attested"
+    },
+    {
+      "term": "WT",
+      "reading": "ウィッチ",
+      "category": "bdo_class",
+      "match": "class",
+      "caseSensitive": true,
+      "sourceIds": [
+        "bdo_classes_2022",
+        "bdo_class_names"
+      ],
+      "evidence": "reading_attested"
+    },
+    {
+      "term": "WZ",
+      "reading": "ウィザード",
+      "category": "bdo_class",
+      "match": "class",
+      "caseSensitive": true,
+      "sourceIds": [
+        "bdo_classes_2022",
+        "bdo_class_names"
+      ],
+      "evidence": "reading_attested"
+    },
+    {
+      "term": "不退の旗築造台",
+      "reading": "フタイノハタチクゾウダイ",
+      "category": "bdo_kanji",
+      "match": "literal",
+      "caseSensitive": true,
+      "sourceIds": [
+        "bdo_nodewar"
+      ],
+      "evidence": "term_attested_reading_selected"
+    },
+    {
+      "term": "再使用待機時間",
+      "reading": "サイシヨウタイキジカン",
+      "category": "bdo_kanji",
+      "match": "literal",
+      "caseSensitive": true,
+      "sourceIds": [
+        "bdo_pvp"
+      ],
+      "evidence": "term_attested_reading_selected"
+    },
+    {
+      "term": "前方ガード",
+      "reading": "ゼンポウガード",
+      "category": "bdo_kanji",
+      "match": "literal",
+      "caseSensitive": true,
+      "sourceIds": [
+        "bdo_pvp"
+      ],
+      "evidence": "term_attested_reading_selected"
+    },
+    {
+      "term": "大砲観測所",
+      "reading": "タイホウカンソクジョ",
+      "category": "bdo_kanji",
+      "match": "literal",
+      "caseSensitive": true,
+      "sourceIds": [
+        "bdo_nodewar"
+      ],
+      "evidence": "term_attested_reading_selected"
+    },
+    {
+      "term": "強化火炎塔",
+      "reading": "キョウカカエントウ",
+      "category": "bdo_kanji",
+      "match": "literal",
+      "caseSensitive": true,
+      "sourceIds": [
+        "bdo_nodewar"
+      ],
+      "evidence": "term_attested_reading_selected"
+    },
+    {
+      "term": "自由決闘場",
+      "reading": "ジユウケットウジョウ",
+      "category": "bdo_kanji",
+      "match": "literal",
+      "caseSensitive": true,
+      "sourceIds": [
+        "bdo_pvp"
+      ],
+      "evidence": "term_attested_reading_selected"
+    },
+    {
+      "term": "象の飼育所",
+      "reading": "ゾウノシイクジョ",
+      "category": "bdo_kanji",
+      "match": "literal",
+      "caseSensitive": true,
+      "sourceIds": [
+        "bdo_nodewar"
+      ],
+      "evidence": "term_attested_reading_selected"
+    },
+    {
+      "term": "野戦司令部",
+      "reading": "ヤセンシレイブ",
+      "category": "bdo_kanji",
+      "match": "literal",
+      "caseSensitive": true,
+      "sourceIds": [
+        "bdo_nodewar"
+      ],
+      "evidence": "term_attested_reading_selected"
+    },
+    {
+      "term": "不退の旗",
+      "reading": "フタイノハタ",
+      "category": "bdo_kanji",
+      "match": "literal",
+      "caseSensitive": true,
+      "sourceIds": [
+        "bdo_nodewar"
+      ],
+      "evidence": "term_attested_reading_selected"
+    },
+    {
+      "term": "緊急回避",
+      "reading": "キンキュウカイヒ",
+      "category": "bdo_kanji",
+      "match": "literal",
+      "caseSensitive": true,
+      "sourceIds": [
+        "bdo_pvp"
+      ],
+      "evidence": "term_attested_reading_selected"
+    },
+    {
+      "term": "詠唱速度",
+      "reading": "エイショウソクド",
+      "category": "bdo_kanji",
+      "match": "literal",
+      "caseSensitive": true,
+      "sourceIds": [
+        "bdo_pvp"
+      ],
+      "evidence": "term_attested_reading_selected"
+    },
+    {
+      "term": "赤の戦場",
+      "reading": "アカノセンジョウ",
+      "category": "bdo_kanji",
+      "match": "literal",
+      "caseSensitive": true,
+      "sourceIds": [
+        "bdo_pvp"
+      ],
+      "evidence": "term_attested_reading_selected"
+    },
+    {
+      "term": "防御判定",
+      "reading": "ボウギョハンテイ",
+      "category": "bdo_kanji",
+      "match": "literal",
+      "caseSensitive": true,
+      "sourceIds": [
+        "bdo_pvp"
+      ],
+      "evidence": "term_attested_reading_selected"
+    },
+    {
+      "term": "青の戦場",
+      "reading": "アオノセンジョウ",
+      "category": "bdo_kanji",
+      "match": "literal",
+      "caseSensitive": true,
+      "sourceIds": [
+        "bdo_blue"
+      ],
+      "evidence": "term_attested_reading_selected"
+    },
+    {
+      "term": "占領戦",
+      "reading": "センリョウセン",
+      "category": "bdo_kanji",
+      "match": "literal",
+      "caseSensitive": true,
+      "sourceIds": [
+        "bdo_nodewar"
+      ],
+      "evidence": "term_attested_reading_selected"
+    },
+    {
+      "term": "拠点戦",
+      "reading": "キョテンセン",
+      "category": "bdo_kanji",
+      "match": "literal",
+      "caseSensitive": true,
+      "sourceIds": [
+        "bdo_nodewar"
+      ],
+      "evidence": "term_attested_reading_selected"
+    },
+    {
+      "term": "指揮所",
+      "reading": "シキショ",
+      "category": "bdo_kanji",
+      "match": "literal",
+      "caseSensitive": true,
+      "sourceIds": [
+        "bdo_nodewar"
+      ],
+      "evidence": "term_attested_reading_selected"
+    },
+    {
+      "term": "浮かし",
+      "reading": "ウカシ",
+      "category": "bdo_kanji",
+      "match": "literal",
+      "caseSensitive": true,
+      "sourceIds": [
+        "bdo_pvp"
+      ],
+      "evidence": "term_attested_reading_selected"
+    },
+    {
+      "term": "火炎塔",
+      "reading": "カエントウ",
+      "category": "bdo_kanji",
+      "match": "literal",
+      "caseSensitive": true,
+      "sourceIds": [
+        "bdo_nodewar"
+      ],
+      "evidence": "term_attested_reading_selected"
+    },
+    {
+      "term": "白兵戦",
+      "reading": "ハクヘイセン",
+      "category": "bdo_kanji",
+      "match": "literal",
+      "caseSensitive": true,
+      "sourceIds": [
+        "bdo_nodewar"
+      ],
+      "evidence": "term_attested_reading_selected"
+    },
+    {
+      "term": "耐久度",
+      "reading": "タイキュウド",
+      "category": "bdo_kanji",
+      "match": "literal",
+      "caseSensitive": true,
+      "sourceIds": [
+        "bdo_nodewar"
+      ],
+      "evidence": "term_attested_reading_selected"
+    },
+    {
+      "term": "船首像",
+      "reading": "センシュゾウ",
+      "category": "bdo_kanji",
+      "match": "literal",
+      "caseSensitive": true,
+      "sourceIds": [
+        "bdo_blue"
+      ],
+      "evidence": "term_attested_reading_selected"
+    },
+    {
+      "term": "補給官",
+      "reading": "ホキュウカン",
+      "category": "bdo_kanji",
+      "match": "literal",
+      "caseSensitive": true,
+      "sourceIds": [
+        "bdo_nodewar"
+      ],
+      "evidence": "term_attested_reading_selected"
+    },
+    {
+      "term": "補給所",
+      "reading": "ホキュウジョ",
+      "category": "bdo_kanji",
+      "match": "literal",
+      "caseSensitive": true,
+      "sourceIds": [
+        "bdo_nodewar"
+      ],
+      "evidence": "term_attested_reading_selected"
+    },
+    {
+      "term": "重帆船",
+      "reading": "ジュウハンセン",
+      "category": "bdo_kanji",
+      "match": "literal",
+      "caseSensitive": true,
+      "sourceIds": [
+        "bdo_blue"
+      ],
+      "evidence": "term_attested_reading_selected"
+    },
+    {
+      "term": "闘技場",
+      "reading": "トウギジョウ",
+      "category": "bdo_kanji",
+      "match": "literal",
+      "caseSensitive": true,
+      "sourceIds": [
+        "bdo_pvp"
+      ],
+      "evidence": "term_attested_reading_selected"
+    },
+    {
+      "term": "伝承",
+      "reading": "デンショウ",
+      "category": "bdo_kanji",
+      "match": "literal",
+      "caseSensitive": true,
+      "sourceIds": [
+        "bdo_pvp"
+      ],
+      "evidence": "term_attested_reading_selected"
+    },
+    {
+      "term": "参謀",
+      "reading": "サンボウ",
+      "category": "bdo_kanji",
+      "match": "literal",
+      "caseSensitive": true,
+      "sourceIds": [
+        "bdo_nodewar"
+      ],
+      "evidence": "term_attested_reading_selected"
+    },
+    {
+      "term": "命中",
+      "reading": "メイチュウ",
+      "category": "bdo_kanji",
+      "match": "literal",
+      "caseSensitive": true,
+      "sourceIds": [
+        "bdo_pvp"
+      ],
+      "evidence": "term_attested_reading_selected"
+    },
+    {
+      "term": "城砦",
+      "reading": "ジョウサイ",
+      "category": "bdo_kanji",
+      "match": "literal",
+      "caseSensitive": true,
+      "sourceIds": [
+        "bdo_nodewar"
+      ],
+      "evidence": "term_attested_reading_selected"
+    },
+    {
+      "term": "大砲",
+      "reading": "タイホウ",
+      "category": "bdo_kanji",
+      "match": "literal",
+      "caseSensitive": true,
+      "sourceIds": [
+        "bdo_nodewar"
+      ],
+      "evidence": "term_attested_reading_selected"
+    },
+    {
+      "term": "守城",
+      "reading": "シュジョウ",
+      "category": "bdo_kanji",
+      "match": "literal",
+      "caseSensitive": true,
+      "sourceIds": [
+        "bdo_nodewar"
+      ],
+      "evidence": "term_attested_reading_selected"
+    },
+    {
+      "term": "抜錨",
+      "reading": "バツビョウ",
+      "category": "bdo_kanji",
+      "match": "literal",
+      "caseSensitive": true,
+      "sourceIds": [
+        "bdo_blue"
+      ],
+      "evidence": "term_attested_reading_selected"
+    },
+    {
+      "term": "攻城",
+      "reading": "コウジョウ",
+      "category": "bdo_kanji",
+      "match": "literal",
+      "caseSensitive": true,
+      "sourceIds": [
+        "bdo_nodewar"
+      ],
+      "evidence": "term_attested_reading_selected"
+    },
+    {
+      "term": "気絶",
+      "reading": "キゼツ",
+      "category": "bdo_kanji",
+      "match": "literal",
+      "caseSensitive": true,
+      "sourceIds": [
+        "bdo_pvp"
+      ],
+      "evidence": "term_attested_reading_selected"
+    },
+    {
+      "term": "氷結",
+      "reading": "ヒョウケツ",
+      "category": "bdo_kanji",
+      "match": "literal",
+      "caseSensitive": true,
+      "sourceIds": [
+        "bdo_pvp"
+      ],
+      "evidence": "term_attested_reading_selected"
+    },
+    {
+      "term": "火箭",
+      "reading": "カセン",
+      "category": "bdo_kanji",
+      "match": "literal",
+      "caseSensitive": true,
+      "sourceIds": [
+        "bdo_nodewar"
+      ],
+      "evidence": "term_attested_reading_selected"
+    },
+    {
+      "term": "砲兵",
+      "reading": "ホウヘイ",
+      "category": "bdo_kanji",
+      "match": "literal",
+      "caseSensitive": true,
+      "sourceIds": [
+        "bdo_nodewar"
+      ],
+      "evidence": "term_attested_reading_selected"
+    },
+    {
+      "term": "砲撃",
+      "reading": "ホウゲキ",
+      "category": "bdo_kanji",
+      "match": "literal",
+      "caseSensitive": true,
+      "sourceIds": [
+        "bdo_blue"
+      ],
+      "evidence": "term_attested_reading_selected"
+    },
+    {
+      "term": "硬直",
+      "reading": "コウチョク",
+      "category": "bdo_kanji",
+      "match": "literal",
+      "caseSensitive": true,
+      "sourceIds": [
+        "bdo_pvp"
+      ],
+      "evidence": "term_attested_reading_selected"
+    },
+    {
+      "term": "船舶",
+      "reading": "センパク",
+      "category": "bdo_kanji",
+      "match": "literal",
+      "caseSensitive": true,
+      "sourceIds": [
+        "bdo_blue"
+      ],
+      "evidence": "term_attested_reading_selected"
+    },
+    {
+      "term": "艦砲",
+      "reading": "カンポウ",
+      "category": "bdo_kanji",
+      "match": "literal",
+      "caseSensitive": true,
+      "sourceIds": [
+        "bdo_blue"
+      ],
+      "evidence": "term_attested_reading_selected"
+    },
+    {
+      "term": "覚醒",
+      "reading": "カクセイ",
+      "category": "bdo_kanji",
+      "match": "literal",
+      "caseSensitive": true,
+      "sourceIds": [
+        "bdo_pvp"
+      ],
+      "evidence": "term_attested_reading_selected"
+    },
+    {
+      "term": "貫通",
+      "reading": "カンツウ",
+      "category": "bdo_kanji",
+      "match": "literal",
+      "caseSensitive": true,
+      "sourceIds": [
+        "bdo_pvp"
+      ],
+      "evidence": "term_attested_reading_selected"
+    },
+    {
+      "term": "連盟",
+      "reading": "レンメイ",
+      "category": "bdo_kanji",
+      "match": "literal",
+      "caseSensitive": true,
+      "sourceIds": [
+        "bdo_nodewar"
+      ],
+      "evidence": "term_attested_reading_selected"
+    },
+    {
+      "term": "遊撃",
+      "reading": "ユウゲキ",
+      "category": "bdo_kanji",
+      "match": "literal",
+      "caseSensitive": true,
+      "sourceIds": [
+        "bdo_nodewar"
+      ],
+      "evidence": "term_attested_reading_selected"
+    },
+    {
+      "term": "desync",
+      "reading": "ディーシンク",
+      "category": "chat_acronym",
+      "match": "ascii",
+      "caseSensitive": false,
+      "sourceIds": [
+        "pso"
+      ],
+      "evidence": "term_attested_reading_selected"
+    },
+    {
+      "term": "grats",
+      "reading": "グラッツ",
+      "category": "chat_acronym",
+      "match": "ascii",
+      "caseSensitive": false,
+      "sourceIds": [
+        "pso"
+      ],
+      "evidence": "term_attested_reading_selected"
+    },
+    {
+      "term": "gratz",
+      "reading": "グラッツ",
+      "category": "chat_acronym",
+      "match": "ascii",
+      "caseSensitive": false,
+      "sourceIds": [
+        "pso"
+      ],
+      "evidence": "term_attested_reading_selected"
+    },
+    {
+      "term": "laggy",
+      "reading": "ラギー",
+      "category": "chat_acronym",
+      "match": "ascii",
+      "caseSensitive": false,
+      "sourceIds": [
+        "pso"
+      ],
+      "evidence": "term_attested_reading_selected"
+    },
+    {
+      "term": "relog",
+      "reading": "リログ",
+      "category": "chat_acronym",
+      "match": "ascii",
+      "caseSensitive": false,
+      "sourceIds": [
+        "pso"
+      ],
+      "evidence": "term_attested_reading_selected"
+    },
+    {
+      "term": "ASAP",
+      "reading": "エーエスエーピー",
+      "category": "chat_acronym",
+      "match": "ascii",
+      "caseSensitive": false,
+      "sourceIds": [
+        "pso"
+      ],
+      "evidence": "term_attested_reading_selected"
+    },
+    {
+      "term": "BBL",
+      "reading": "ビービーエル",
+      "category": "chat_acronym",
+      "match": "ascii",
+      "caseSensitive": false,
+      "sourceIds": [
+        "pso"
+      ],
+      "evidence": "term_attested_reading_selected"
+    },
+    {
+      "term": "BRB",
+      "reading": "ビーアールビー",
+      "category": "chat_acronym",
+      "match": "ascii",
+      "caseSensitive": false,
+      "sourceIds": [
+        "pso"
+      ],
+      "evidence": "term_attested_reading_selected"
+    },
+    {
+      "term": "BRT",
+      "reading": "ビーアールティー",
+      "category": "chat_acronym",
+      "match": "ascii",
+      "caseSensitive": false,
+      "sourceIds": [
+        "pso"
+      ],
+      "evidence": "term_attested_reading_selected"
+    },
+    {
+      "term": "BTW",
+      "reading": "ビーティーダブリュー",
+      "category": "chat_acronym",
+      "match": "ascii",
+      "caseSensitive": false,
+      "sourceIds": [
+        "pso"
+      ],
+      "evidence": "term_attested_reading_selected"
+    },
+    {
+      "term": "CYA",
+      "reading": "シーヤー",
+      "category": "chat_acronym",
+      "match": "ascii",
+      "caseSensitive": false,
+      "sourceIds": [
+        "pso"
+      ],
+      "evidence": "term_attested_reading_selected"
+    },
+    {
+      "term": "FYI",
+      "reading": "エフワイアイ",
+      "category": "chat_acronym",
+      "match": "ascii",
+      "caseSensitive": false,
+      "sourceIds": [
+        "pso"
+      ],
+      "evidence": "term_attested_reading_selected"
+    },
+    {
+      "term": "GTG",
+      "reading": "ジーティージー",
+      "category": "chat_acronym",
+      "match": "ascii",
+      "caseSensitive": false,
+      "sourceIds": [
+        "pso"
+      ],
+      "evidence": "term_attested_reading_selected"
+    },
+    {
+      "term": "IDK",
+      "reading": "アイディーケー",
+      "category": "chat_acronym",
+      "match": "ascii",
+      "caseSensitive": false,
+      "sourceIds": [
+        "pso"
+      ],
+      "evidence": "term_attested_reading_selected"
+    },
+    {
+      "term": "IMO",
+      "reading": "アイエムオー",
+      "category": "chat_acronym",
+      "match": "ascii",
+      "caseSensitive": false,
+      "sourceIds": [
+        "pso"
+      ],
+      "evidence": "term_attested_reading_selected"
+    },
+    {
+      "term": "NVM",
+      "reading": "ネバーマインド",
+      "category": "chat_acronym",
+      "match": "ascii",
+      "caseSensitive": false,
+      "sourceIds": [
+        "pso"
+      ],
+      "evidence": "term_attested_reading_selected"
+    },
+    {
+      "term": "OMW",
+      "reading": "オーエムダブリュー",
+      "category": "chat_acronym",
+      "match": "ascii",
+      "caseSensitive": false,
+      "sourceIds": [
+        "pso"
+      ],
+      "evidence": "term_attested_reading_selected"
+    },
+    {
+      "term": "PLS",
+      "reading": "プリーズ",
+      "category": "chat_acronym",
+      "match": "ascii",
+      "caseSensitive": false,
+      "sourceIds": [
+        "pso"
+      ],
+      "evidence": "term_attested_reading_selected"
+    },
+    {
+      "term": "PLZ",
+      "reading": "プリーズ",
+      "category": "chat_acronym",
+      "match": "ascii",
+      "caseSensitive": false,
+      "sourceIds": [
+        "pso"
+      ],
+      "evidence": "term_attested_reading_selected"
+    },
+    {
+      "term": "RDY",
+      "reading": "レディー",
+      "category": "chat_acronym",
+      "match": "ascii",
+      "caseSensitive": false,
+      "sourceIds": [
+        "pso"
+      ],
+      "evidence": "term_attested_reading_selected"
+    },
+    {
+      "term": "ROM",
+      "reading": "ロム",
+      "category": "chat_acronym",
+      "match": "ascii",
+      "caseSensitive": false,
+      "sourceIds": [
+        "hatosan"
+      ],
+      "evidence": "term_attested_reading_selected"
+    },
+    {
+      "term": "SRY",
+      "reading": "ソーリー",
+      "category": "chat_acronym",
+      "match": "ascii",
+      "caseSensitive": false,
+      "sourceIds": [
+        "pso"
+      ],
+      "evidence": "term_attested_reading_selected"
+    },
+    {
+      "term": "TBH",
+      "reading": "ティービーエイチ",
+      "category": "chat_acronym",
+      "match": "ascii",
+      "caseSensitive": false,
+      "sourceIds": [
+        "pso"
+      ],
+      "evidence": "term_attested_reading_selected"
+    },
+    {
+      "term": "THX",
+      "reading": "サンクス",
+      "category": "chat_acronym",
+      "match": "ascii",
+      "caseSensitive": false,
+      "sourceIds": [
+        "pso"
+      ],
+      "evidence": "term_attested_reading_selected"
+    },
+    {
+      "term": "lag",
+      "reading": "ラグ",
+      "category": "chat_acronym",
+      "match": "ascii",
+      "caseSensitive": false,
+      "sourceIds": [
+        "pso"
+      ],
+      "evidence": "term_attested_reading_selected"
+    },
+    {
+      "term": "GJ",
+      "reading": "グッジョブ",
+      "category": "chat_acronym",
+      "match": "ascii",
+      "caseSensitive": false,
+      "sourceIds": [
+        "pso"
+      ],
+      "evidence": "term_attested_reading_selected"
+    },
+    {
+      "term": "GL",
+      "reading": "ジーエル",
+      "category": "chat_acronym",
+      "match": "ascii",
+      "caseSensitive": false,
+      "sourceIds": [
+        "pso"
+      ],
+      "evidence": "term_attested_reading_selected"
+    },
+    {
+      "term": "HF",
+      "reading": "エイチエフ",
+      "category": "chat_acronym",
+      "match": "ascii",
+      "caseSensitive": false,
+      "sourceIds": [
+        "pso"
+      ],
+      "evidence": "term_attested_reading_selected"
+    },
+    {
+      "term": "NP",
+      "reading": "ノープロブレム",
+      "category": "chat_acronym",
+      "match": "ascii",
+      "caseSensitive": false,
+      "sourceIds": [
+        "pso"
+      ],
+      "evidence": "term_attested_reading_selected"
+    },
+    {
+      "term": "TY",
+      "reading": "サンキュー",
+      "category": "chat_acronym",
+      "match": "ascii",
+      "caseSensitive": false,
+      "sourceIds": [
+        "pso"
+      ],
+      "evidence": "term_attested_reading_selected"
+    },
+    {
+      "term": "WB",
+      "reading": "ウェルカムバック",
+      "category": "chat_acronym",
+      "match": "ascii",
+      "caseSensitive": false,
+      "sourceIds": [
+        "pso"
+      ],
+      "evidence": "term_attested_reading_selected"
+    },
+    {
+      "term": "YW",
+      "reading": "ユアウェルカム",
+      "category": "chat_acronym",
+      "match": "ascii",
+      "caseSensitive": false,
+      "sourceIds": [
+        "pso"
+      ],
+      "evidence": "term_attested_reading_selected"
+    },
+    {
+      "term": "w8",
+      "reading": "ウェイト",
+      "category": "chat_acronym",
+      "match": "ascii",
+      "caseSensitive": false,
+      "sourceIds": [
+        "pso"
+      ],
+      "evidence": "term_attested_reading_selected"
+    },
+    {
+      "term": "おk",
+      "reading": "オーケー",
+      "category": "chat_spelling",
+      "match": "mixed",
+      "caseSensitive": false,
+      "sourceIds": [],
+      "evidence": "editorial"
+    },
+    {
+      "term": "TTS",
+      "reading": "ティーティーエス",
+      "category": "common_ascii",
+      "match": "ascii",
+      "caseSensitive": false,
+      "sourceIds": [],
+      "evidence": "editorial"
+    },
+    {
+      "term": "URL",
+      "reading": "ユーアールエル",
+      "category": "common_ascii",
+      "match": "ascii",
+      "caseSensitive": false,
+      "sourceIds": [],
+      "evidence": "editorial"
+    },
+    {
+      "term": "NG",
+      "reading": "エヌジー",
+      "category": "common_ascii",
+      "match": "ascii",
+      "caseSensitive": false,
+      "sourceIds": [],
+      "evidence": "editorial"
+    },
+    {
+      "term": "OK",
+      "reading": "オーケー",
+      "category": "common_ascii",
+      "match": "ascii",
+      "caseSensitive": false,
+      "sourceIds": [],
+      "evidence": "editorial"
+    },
+    {
+      "term": "GGWP",
+      "reading": "ジージーダブリューピー",
+      "category": "gaming_acronym",
+      "match": "ascii",
+      "caseSensitive": false,
+      "sourceIds": [
+        "jcg"
+      ],
+      "evidence": "term_attested_reading_selected"
+    },
+    {
+      "term": "GLHF",
+      "reading": "ジーエルエイチエフ",
+      "category": "gaming_acronym",
+      "match": "ascii",
+      "caseSensitive": false,
+      "sourceIds": [
+        "jcg",
+        "riot_chat"
+      ],
+      "evidence": "term_attested_reading_selected"
+    },
+    {
+      "term": "ADS",
+      "reading": "エーディーエス",
+      "category": "gaming_acronym",
+      "match": "ascii",
+      "caseSensitive": false,
+      "sourceIds": [
+        "jcg"
+      ],
+      "evidence": "term_attested_reading_selected"
+    },
+    {
+      "term": "AFK",
+      "reading": "エーエフケー",
+      "category": "gaming_acronym",
+      "match": "ascii",
+      "caseSensitive": false,
+      "sourceIds": [
+        "jcg",
+        "riot_chat"
+      ],
+      "evidence": "term_attested_reading_selected"
+    },
+    {
+      "term": "DMR",
+      "reading": "ディーエムアール",
+      "category": "gaming_acronym",
+      "match": "ascii",
+      "caseSensitive": false,
+      "sourceIds": [
+        "jcg"
+      ],
+      "evidence": "term_attested_reading_selected"
+    },
+    {
+      "term": "DPS",
+      "reading": "ディーピーエス",
+      "category": "gaming_acronym",
+      "match": "ascii",
+      "caseSensitive": false,
+      "sourceIds": [
+        "jcg"
+      ],
+      "evidence": "term_attested_reading_selected"
+    },
+    {
+      "term": "IGL",
+      "reading": "アイジーエル",
+      "category": "gaming_acronym",
+      "match": "ascii",
+      "caseSensitive": false,
+      "sourceIds": [
+        "jcg"
+      ],
+      "evidence": "term_attested_reading_selected"
+    },
+    {
+      "term": "LMG",
+      "reading": "エルエムジー",
+      "category": "gaming_acronym",
+      "match": "ascii",
+      "caseSensitive": false,
+      "sourceIds": [
+        "jcg"
+      ],
+      "evidence": "term_attested_reading_selected"
+    },
+    {
+      "term": "SMG",
+      "reading": "エスエムジー",
+      "category": "gaming_acronym",
+      "match": "ascii",
+      "caseSensitive": false,
+      "sourceIds": [
+        "jcg"
+      ],
+      "evidence": "term_attested_reading_selected"
+    },
+    {
+      "term": "TTK",
+      "reading": "ティーティーケー",
+      "category": "gaming_acronym",
+      "match": "ascii",
+      "caseSensitive": false,
+      "sourceIds": [
+        "jcg"
+      ],
+      "evidence": "term_attested_reading_selected"
+    },
+    {
+      "term": "AR",
+      "reading": "エーアール",
+      "category": "gaming_acronym",
+      "match": "ascii",
+      "caseSensitive": false,
+      "sourceIds": [
+        "jcg"
+      ],
+      "evidence": "term_attested_reading_selected"
+    },
+    {
+      "term": "FF",
+      "reading": "エフエフ",
+      "category": "gaming_acronym",
+      "match": "ascii",
+      "caseSensitive": false,
+      "sourceIds": [
+        "jcg"
+      ],
+      "evidence": "term_attested_reading_selected"
+    },
+    {
+      "term": "GG",
+      "reading": "ジージー",
+      "category": "gaming_acronym",
+      "match": "ascii",
+      "caseSensitive": false,
+      "sourceIds": [
+        "jcg",
+        "riot_chat"
+      ],
+      "evidence": "term_attested_reading_selected"
+    },
+    {
+      "term": "HP",
+      "reading": "エイチピー",
+      "category": "gaming_acronym",
+      "match": "ascii",
+      "caseSensitive": false,
+      "sourceIds": [
+        "jcg",
+        "bdo_solare"
+      ],
+      "evidence": "term_attested_reading_selected"
+    },
+    {
+      "term": "HS",
+      "reading": "エイチエス",
+      "category": "gaming_acronym",
+      "match": "ascii",
+      "caseSensitive": false,
+      "sourceIds": [
+        "jcg"
+      ],
+      "evidence": "term_attested_reading_selected"
+    },
+    {
+      "term": "NT",
+      "reading": "エヌティー",
+      "category": "gaming_acronym",
+      "match": "ascii",
+      "caseSensitive": false,
+      "sourceIds": [
+        "jcg"
+      ],
+      "evidence": "term_attested_reading_selected"
+    },
+    {
+      "term": "PT",
+      "reading": "ピーティー",
+      "category": "gaming_acronym",
+      "match": "ascii",
+      "caseSensitive": false,
+      "sourceIds": [],
+      "evidence": "editorial"
+    },
+    {
+      "term": "SG",
+      "reading": "エスジー",
+      "category": "gaming_acronym",
+      "match": "ascii",
+      "caseSensitive": false,
+      "sourceIds": [
+        "jcg"
+      ],
+      "evidence": "term_attested_reading_selected"
+    },
+    {
+      "term": "SP",
+      "reading": "エスピー",
+      "category": "gaming_acronym",
+      "match": "ascii",
+      "caseSensitive": false,
+      "sourceIds": [],
+      "evidence": "editorial"
+    },
+    {
+      "term": "SR",
+      "reading": "エスアール",
+      "category": "gaming_acronym",
+      "match": "ascii",
+      "caseSensitive": false,
+      "sourceIds": [
+        "jcg"
+      ],
+      "evidence": "term_attested_reading_selected"
+    },
+    {
+      "term": "TK",
+      "reading": "ティーケー",
+      "category": "gaming_acronym",
+      "match": "ascii",
+      "caseSensitive": false,
+      "sourceIds": [
+        "jcg"
+      ],
+      "evidence": "term_attested_reading_selected"
+    },
+    {
+      "term": "WP",
+      "reading": "ダブリューピー",
+      "category": "gaming_acronym",
+      "match": "ascii",
+      "caseSensitive": false,
+      "sourceIds": [
+        "jcg"
+      ],
+      "evidence": "term_attested_reading_selected"
+    },
+    {
+      "term": "Discord",
+      "reading": "ディスコード",
+      "category": "gaming_ascii",
+      "match": "ascii",
+      "caseSensitive": false,
+      "sourceIds": [],
+      "evidence": "editorial"
+    },
+    {
+      "term": "MMORPG",
+      "reading": "エムエムオーアールピージー",
+      "category": "gaming_ascii",
+      "match": "ascii",
+      "caseSensitive": false,
+      "sourceIds": [],
+      "evidence": "editorial"
+    },
+    {
+      "term": "iframe",
+      "reading": "アイフレーム",
+      "category": "gaming_ascii",
+      "match": "ascii",
+      "caseSensitive": false,
+      "sourceIds": [],
+      "evidence": "editorial"
+    },
+    {
+      "term": "Enter",
+      "reading": "エンター",
+      "category": "gaming_ascii",
+      "match": "ascii",
+      "caseSensitive": false,
+      "sourceIds": [],
+      "evidence": "editorial"
+    },
+    {
+      "term": "PvPvE",
+      "reading": "ピーブイピーブイイー",
+      "category": "gaming_ascii",
+      "match": "ascii",
+      "caseSensitive": false,
+      "sourceIds": [],
+      "evidence": "editorial"
+    },
+    {
+      "term": "Shift",
+      "reading": "シフト",
+      "category": "gaming_ascii",
+      "match": "ascii",
+      "caseSensitive": false,
+      "sourceIds": [],
+      "evidence": "editorial"
+    },
+    {
+      "term": "Space",
+      "reading": "スペース",
+      "category": "gaming_ascii",
+      "match": "ascii",
+      "caseSensitive": false,
+      "sourceIds": [],
+      "evidence": "editorial"
+    },
+    {
+      "term": "Ctrl",
+      "reading": "コントロール",
+      "category": "gaming_ascii",
+      "match": "ascii",
+      "caseSensitive": false,
+      "sourceIds": [],
+      "evidence": "editorial"
+    },
+    {
+      "term": "WASD",
+      "reading": "ダブリューエーエスディー",
+      "category": "gaming_ascii",
+      "match": "ascii",
+      "caseSensitive": false,
+      "sourceIds": [],
+      "evidence": "editorial"
+    },
+    {
+      "term": "Alt",
+      "reading": "オルト",
+      "category": "gaming_ascii",
+      "match": "ascii",
+      "caseSensitive": false,
+      "sourceIds": [],
+      "evidence": "editorial"
+    },
+    {
+      "term": "AoE",
+      "reading": "エーオーイー",
+      "category": "gaming_ascii",
+      "match": "ascii",
+      "caseSensitive": false,
+      "sourceIds": [],
+      "evidence": "editorial"
+    },
+    {
+      "term": "DoT",
+      "reading": "ドット",
+      "category": "gaming_ascii",
+      "match": "ascii",
+      "caseSensitive": false,
+      "sourceIds": [],
+      "evidence": "editorial"
+    },
+    {
+      "term": "Esc",
+      "reading": "エスケープ",
+      "category": "gaming_ascii",
+      "match": "ascii",
+      "caseSensitive": false,
+      "sourceIds": [],
+      "evidence": "editorial"
+    },
+    {
+      "term": "FPS",
+      "reading": "エフピーエス",
+      "category": "gaming_ascii",
+      "match": "ascii",
+      "caseSensitive": false,
+      "sourceIds": [],
+      "evidence": "editorial"
+    },
+    {
+      "term": "GDM",
+      "reading": "ジーディーエム",
+      "category": "gaming_ascii",
+      "match": "ascii",
+      "caseSensitive": false,
+      "sourceIds": [
+        "discord_dm"
+      ],
+      "evidence": "term_attested_reading_selected"
+    },
+    {
+      "term": "GvG",
+      "reading": "ジーブイジー",
+      "category": "gaming_ascii",
+      "match": "ascii",
+      "caseSensitive": false,
+      "sourceIds": [
+        "bdo_pvp"
+      ],
+      "evidence": "term_attested_reading_selected"
+    },
+    {
+      "term": "LMB",
+      "reading": "ヒダリクリック",
+      "category": "gaming_ascii",
+      "match": "ascii",
+      "caseSensitive": false,
+      "sourceIds": [],
+      "evidence": "editorial"
+    },
+    {
+      "term": "MMO",
+      "reading": "エムエムオー",
+      "category": "gaming_ascii",
+      "match": "ascii",
+      "caseSensitive": false,
+      "sourceIds": [],
+      "evidence": "editorial"
+    },
+    {
+      "term": "MOB",
+      "reading": "モブ",
+      "category": "gaming_ascii",
+      "match": "ascii",
+      "caseSensitive": false,
+      "sourceIds": [
+        "bdo_glossary"
+      ],
+      "evidence": "term_attested_reading_selected"
+    },
+    {
+      "term": "NPC",
+      "reading": "エヌピーシー",
+      "category": "gaming_ascii",
+      "match": "ascii",
+      "caseSensitive": false,
+      "sourceIds": [
+        "bdo_pvp"
+      ],
+      "evidence": "term_attested_reading_selected"
+    },
+    {
+      "term": "PvE",
+      "reading": "ピーブイイー",
+      "category": "gaming_ascii",
+      "match": "ascii",
+      "caseSensitive": false,
+      "sourceIds": [
+        "bdo_pvp"
+      ],
+      "evidence": "term_attested_reading_selected"
+    },
+    {
+      "term": "PvP",
+      "reading": "ピーブイピー",
+      "category": "gaming_ascii",
+      "match": "ascii",
+      "caseSensitive": false,
+      "sourceIds": [
+        "bdo_pvp"
+      ],
+      "evidence": "term_attested_reading_selected"
+    },
+    {
+      "term": "RMB",
+      "reading": "ミギクリック",
+      "category": "gaming_ascii",
+      "match": "ascii",
+      "caseSensitive": false,
+      "sourceIds": [],
+      "evidence": "editorial"
+    },
+    {
+      "term": "RPG",
+      "reading": "アールピージー",
+      "category": "gaming_ascii",
+      "match": "ascii",
+      "caseSensitive": false,
+      "sourceIds": [],
+      "evidence": "editorial"
+    },
+    {
+      "term": "RvR",
+      "reading": "アールブイアール",
+      "category": "gaming_ascii",
+      "match": "ascii",
+      "caseSensitive": false,
+      "sourceIds": [],
+      "evidence": "editorial"
+    },
+    {
+      "term": "TPS",
+      "reading": "ティーピーエス",
+      "category": "gaming_ascii",
+      "match": "ascii",
+      "caseSensitive": false,
+      "sourceIds": [],
+      "evidence": "editorial"
+    },
+    {
+      "term": "Tab",
+      "reading": "タブ",
+      "category": "gaming_ascii",
+      "match": "ascii",
+      "caseSensitive": false,
+      "sourceIds": [],
+      "evidence": "editorial"
+    },
+    {
+      "term": "AD",
+      "reading": "エーディー",
+      "category": "gaming_ascii",
+      "match": "ascii",
+      "caseSensitive": false,
+      "sourceIds": [],
+      "evidence": "editorial"
+    },
+    {
+      "term": "AP",
+      "reading": "エーピー",
+      "category": "gaming_ascii",
+      "match": "ascii",
+      "caseSensitive": false,
+      "sourceIds": [],
+      "evidence": "editorial"
+    },
+    {
+      "term": "CC",
+      "reading": "シーシー",
+      "category": "gaming_ascii",
+      "match": "ascii",
+      "caseSensitive": false,
+      "sourceIds": [
+        "bdo_solare"
+      ],
+      "evidence": "term_attested_reading_selected"
+    },
+    {
+      "term": "CD",
+      "reading": "シーディー",
+      "category": "gaming_ascii",
+      "match": "ascii",
+      "caseSensitive": false,
+      "sourceIds": [],
+      "evidence": "editorial"
+    },
+    {
+      "term": "CT",
+      "reading": "シーティー",
+      "category": "gaming_ascii",
+      "match": "ascii",
+      "caseSensitive": false,
+      "sourceIds": [
+        "bdo_glossary"
+      ],
+      "evidence": "term_attested_reading_selected"
+    },
+    {
+      "term": "DM",
+      "reading": "ディーエム",
+      "category": "gaming_ascii",
+      "match": "ascii",
+      "caseSensitive": false,
+      "sourceIds": [
+        "discord_dm"
+      ],
+      "evidence": "term_attested_reading_selected"
+    },
+    {
+      "term": "DP",
+      "reading": "ディーピー",
+      "category": "gaming_ascii",
+      "match": "ascii",
+      "caseSensitive": false,
+      "sourceIds": [],
+      "evidence": "editorial"
+    },
+    {
+      "term": "EP",
+      "reading": "イーピー",
+      "category": "gaming_ascii",
+      "match": "ascii",
+      "caseSensitive": false,
+      "sourceIds": [],
+      "evidence": "editorial"
+    },
+    {
+      "term": "FG",
+      "reading": "エフジー",
+      "category": "gaming_ascii",
+      "match": "ascii",
+      "caseSensitive": false,
+      "sourceIds": [
+        "bdo_glossary"
+      ],
+      "evidence": "term_attested_reading_selected"
+    },
+    {
+      "term": "FP",
+      "reading": "エフピー",
+      "category": "gaming_ascii",
+      "match": "ascii",
+      "caseSensitive": false,
+      "sourceIds": [],
+      "evidence": "editorial"
+    },
+    {
+      "term": "MP",
+      "reading": "エムピー",
+      "category": "gaming_ascii",
+      "match": "ascii",
+      "caseSensitive": false,
+      "sourceIds": [],
+      "evidence": "editorial"
+    },
+    {
+      "term": "SA",
+      "reading": "エスエー",
+      "category": "gaming_ascii",
+      "match": "ascii",
+      "caseSensitive": false,
+      "sourceIds": [
+        "bdo_glossary"
+      ],
+      "evidence": "term_attested_reading_selected"
+    },
+    {
+      "term": "VC",
+      "reading": "ブイシー",
+      "category": "gaming_ascii",
+      "match": "ascii",
+      "caseSensitive": false,
+      "sourceIds": [],
+      "evidence": "editorial"
+    },
+    {
+      "term": "Buff",
+      "reading": "バフ",
+      "category": "gaming_word",
+      "match": "ascii",
+      "caseSensitive": false,
+      "sourceIds": [
+        "jcg"
+      ],
+      "evidence": "reading_attested"
+    },
+    {
+      "term": "Nerf",
+      "reading": "ナーフ",
+      "category": "gaming_word",
+      "match": "ascii",
+      "caseSensitive": false,
+      "sourceIds": [
+        "jcg"
+      ],
+      "evidence": "reading_attested"
+    },
+    {
+      "term": "AIM",
+      "reading": "エイム",
+      "category": "gaming_word",
+      "match": "ascii",
+      "caseSensitive": false,
+      "sourceIds": [
+        "jcg"
+      ],
+      "evidence": "reading_attested"
+    },
+    {
+      "term": "BOT",
+      "reading": "ボット",
+      "category": "gaming_word",
+      "match": "ascii",
+      "caseSensitive": false,
+      "sourceIds": [
+        "jcg"
+      ],
+      "evidence": "reading_attested"
+    },
+    {
+      "term": "ULT",
+      "reading": "ウルト",
+      "category": "gaming_word",
+      "match": "ascii",
+      "caseSensitive": false,
+      "sourceIds": [
+        "jcg"
+      ],
+      "evidence": "reading_attested"
+    },
+    {
+      "term": "シャドウBAN",
+      "reading": "シャドウバン",
+      "category": "japanese_hybrid_slang",
+      "match": "mixed",
+      "caseSensitive": false,
+      "sourceIds": [
+        "hatosan"
+      ],
+      "evidence": "term_attested_reading_selected"
+    },
+    {
+      "term": "アカBAN",
+      "reading": "アカバン",
+      "category": "japanese_hybrid_slang",
+      "match": "mixed",
+      "caseSensitive": false,
+      "sourceIds": [
+        "hatosan"
+      ],
+      "evidence": "term_attested_reading_selected"
+    },
+    {
+      "term": "ROMる",
+      "reading": "ロムル",
+      "category": "japanese_hybrid_slang",
+      "match": "mixed",
+      "caseSensitive": false,
+      "sourceIds": [],
+      "evidence": "editorial"
+    },
+    {
+      "term": "ROM専",
+      "reading": "ロムセン",
+      "category": "japanese_hybrid_slang",
+      "match": "mixed",
+      "caseSensitive": false,
+      "sourceIds": [],
+      "evidence": "editorial"
+    },
+    {
+      "term": "FF外",
+      "reading": "エフエフガイ",
+      "category": "japanese_hybrid_slang",
+      "match": "mixed",
+      "caseSensitive": false,
+      "sourceIds": [
+        "hatosan"
+      ],
+      "evidence": "term_attested_reading_selected"
+    },
+    {
+      "term": "gdgd",
+      "reading": "グダグダ",
+      "category": "japanese_roman_slang",
+      "match": "ascii",
+      "caseSensitive": false,
+      "sourceIds": [
+        "typing"
+      ],
+      "evidence": "reading_attested"
+    },
+    {
+      "term": "gkbr",
+      "reading": "ガクブル",
+      "category": "japanese_roman_slang",
+      "match": "ascii",
+      "caseSensitive": false,
+      "sourceIds": [
+        "typing"
+      ],
+      "evidence": "reading_attested"
+    },
+    {
+      "term": "ktkr",
+      "reading": "キタコレ",
+      "category": "japanese_roman_slang",
+      "match": "ascii",
+      "caseSensitive": false,
+      "sourceIds": [
+        "typing"
+      ],
+      "evidence": "reading_attested"
+    },
+    {
+      "term": "kwsk",
+      "reading": "クワシク",
+      "category": "japanese_roman_slang",
+      "match": "ascii",
+      "caseSensitive": false,
+      "sourceIds": [
+        "typing"
+      ],
+      "evidence": "reading_attested"
+    },
+    {
+      "term": "wktk",
+      "reading": "ワクテカ",
+      "category": "japanese_roman_slang",
+      "match": "ascii",
+      "caseSensitive": false,
+      "sourceIds": [
+        "typing"
+      ],
+      "evidence": "reading_attested"
+    },
+    {
+      "term": "DQN",
+      "reading": "ドキュン",
+      "category": "japanese_roman_slang",
+      "match": "ascii",
+      "caseSensitive": false,
+      "sourceIds": [
+        "typing"
+      ],
+      "evidence": "reading_attested"
+    },
+    {
+      "term": "ksk",
+      "reading": "カソク",
+      "category": "japanese_roman_slang",
+      "match": "ascii",
+      "caseSensitive": false,
+      "sourceIds": [
+        "typing"
+      ],
+      "evidence": "reading_attested"
+    },
+    {
+      "term": "今北産業",
+      "reading": "イマキタサンギョウ",
+      "category": "japanese_slang",
+      "match": "literal",
+      "caseSensitive": true,
+      "sourceIds": [
+        "typing"
+      ],
+      "evidence": "reading_attested"
+    },
+    {
+      "term": "回線落ち",
+      "reading": "カイセンオチ",
+      "category": "japanese_slang",
+      "match": "literal",
+      "caseSensitive": true,
+      "sourceIds": [
+        "hatosan"
+      ],
+      "evidence": "term_attested_reading_selected"
+    },
+    {
+      "term": "草不可避",
+      "reading": "クサフカヒ",
+      "category": "japanese_slang",
+      "match": "literal",
+      "caseSensitive": true,
+      "sourceIds": [
+        "hatosan"
+      ],
+      "evidence": "term_attested_reading_selected"
+    },
+    {
+      "term": "草生える",
+      "reading": "クサハエル",
+      "category": "japanese_slang",
+      "match": "literal",
+      "caseSensitive": true,
+      "sourceIds": [
+        "hatosan"
+      ],
+      "evidence": "term_attested_reading_selected"
+    },
+    {
+      "term": "サブ垢",
+      "reading": "サブアカ",
+      "category": "japanese_slang",
+      "match": "literal",
+      "caseSensitive": true,
+      "sourceIds": [
+        "hatosan"
+      ],
+      "evidence": "term_attested_reading_selected"
+    },
+    {
+      "term": "リア充",
+      "reading": "リアジュウ",
+      "category": "japanese_slang",
+      "match": "literal",
+      "caseSensitive": true,
+      "sourceIds": [
+        "typing"
+      ],
+      "evidence": "reading_attested"
+    },
+    {
+      "term": "厨二病",
+      "reading": "チュウニビョウ",
+      "category": "japanese_slang",
+      "match": "literal",
+      "caseSensitive": true,
+      "sourceIds": [
+        "quizcastle"
+      ],
+      "evidence": "term_attested_reading_selected"
+    },
+    {
+      "term": "寝落ち",
+      "reading": "ネオチ",
+      "category": "japanese_slang",
+      "match": "literal",
+      "caseSensitive": true,
+      "sourceIds": [
+        "hatosan"
+      ],
+      "evidence": "term_attested_reading_selected"
+    },
+    {
+      "term": "微レ存",
+      "reading": "ビレゾン",
+      "category": "japanese_slang",
+      "match": "literal",
+      "caseSensitive": true,
+      "sourceIds": [
+        "quizcastle"
+      ],
+      "evidence": "reading_attested"
+    },
+    {
+      "term": "懐古厨",
+      "reading": "カイコチュウ",
+      "category": "japanese_slang",
+      "match": "literal",
+      "caseSensitive": true,
+      "sourceIds": [
+        "quizcastle"
+      ],
+      "evidence": "term_attested_reading_selected"
+    },
+    {
+      "term": "投げ銭",
+      "reading": "ナゲセン",
+      "category": "japanese_slang",
+      "match": "literal",
+      "caseSensitive": true,
+      "sourceIds": [
+        "hatosan"
+      ],
+      "evidence": "term_attested_reading_selected"
+    },
+    {
+      "term": "腐女子",
+      "reading": "フジョシ",
+      "category": "japanese_slang",
+      "match": "literal",
+      "caseSensitive": true,
+      "sourceIds": [
+        "quizcastle"
+      ],
+      "evidence": "term_attested_reading_selected"
+    },
+    {
+      "term": "自撮り",
+      "reading": "ジドリ",
+      "category": "japanese_slang",
+      "match": "literal",
+      "caseSensitive": true,
+      "sourceIds": [
+        "hatosan"
+      ],
+      "evidence": "term_attested_reading_selected"
+    },
+    {
+      "term": "身バレ",
+      "reading": "ミバレ",
+      "category": "japanese_slang",
+      "match": "literal",
+      "caseSensitive": true,
+      "sourceIds": [
+        "hatosan"
+      ],
+      "evidence": "term_attested_reading_selected"
+    },
+    {
+      "term": "鍵アカ",
+      "reading": "カギアカ",
+      "category": "japanese_slang",
+      "match": "literal",
+      "caseSensitive": true,
+      "sourceIds": [
+        "hatosan"
+      ],
+      "evidence": "term_attested_reading_selected"
+    },
+    {
+      "term": "黒歴史",
+      "reading": "クロレキシ",
+      "category": "japanese_slang",
+      "match": "literal",
+      "caseSensitive": true,
+      "sourceIds": [
+        "quizcastle"
+      ],
+      "evidence": "term_attested_reading_selected"
+    },
+    {
+      "term": "ネ申",
+      "reading": "カミ",
+      "category": "japanese_slang",
+      "match": "literal",
+      "caseSensitive": true,
+      "sourceIds": [
+        "typing"
+      ],
+      "evidence": "reading_attested"
+    },
+    {
+      "term": "俺得",
+      "reading": "オレトク",
+      "category": "japanese_slang",
+      "match": "literal",
+      "caseSensitive": true,
+      "sourceIds": [
+        "typing"
+      ],
+      "evidence": "reading_attested"
+    },
+    {
+      "term": "厨二",
+      "reading": "チュウニ",
+      "category": "japanese_slang",
+      "match": "literal",
+      "caseSensitive": true,
+      "sourceIds": [
+        "quizcastle"
+      ],
+      "evidence": "term_attested_reading_selected"
+    },
+    {
+      "term": "常考",
+      "reading": "ジョウコウ",
+      "category": "japanese_slang",
+      "match": "literal",
+      "caseSensitive": true,
+      "sourceIds": [
+        "typing"
+      ],
+      "evidence": "reading_attested"
+    },
+    {
+      "term": "情弱",
+      "reading": "ジョウジャク",
+      "category": "japanese_slang",
+      "match": "literal",
+      "caseSensitive": true,
+      "sourceIds": [
+        "typing"
+      ],
+      "evidence": "reading_attested"
+    },
+    {
+      "term": "本垢",
+      "reading": "ホンアカ",
+      "category": "japanese_slang",
+      "match": "literal",
+      "caseSensitive": true,
+      "sourceIds": [
+        "hatosan"
+      ],
+      "evidence": "term_attested_reading_selected"
+    },
+    {
+      "term": "神回",
+      "reading": "カミカイ",
+      "category": "japanese_slang",
+      "match": "literal",
+      "caseSensitive": true,
+      "sourceIds": [
+        "hatosan"
+      ],
+      "evidence": "term_attested_reading_selected"
+    },
+    {
+      "term": "禿同",
+      "reading": "ハゲドウ",
+      "category": "japanese_slang",
+      "match": "literal",
+      "caseSensitive": true,
+      "sourceIds": [
+        "quizcastle"
+      ],
+      "evidence": "reading_attested"
+    },
+    {
+      "term": "胸熱",
+      "reading": "ムネアツ",
+      "category": "japanese_slang",
+      "match": "literal",
+      "caseSensitive": true,
+      "sourceIds": [],
+      "evidence": "editorial"
+    },
+    {
+      "term": "芋る",
+      "reading": "イモル",
+      "category": "japanese_slang",
+      "match": "literal",
+      "caseSensitive": true,
+      "sourceIds": [
+        "hatosan"
+      ],
+      "evidence": "term_attested_reading_selected"
+    },
+    {
+      "term": "裏垢",
+      "reading": "ウラアカ",
+      "category": "japanese_slang",
+      "match": "literal",
+      "caseSensitive": true,
+      "sourceIds": [
+        "hatosan"
+      ],
+      "evidence": "term_attested_reading_selected"
+    },
+    {
+      "term": "誤爆",
+      "reading": "ゴバク",
+      "category": "japanese_slang",
+      "match": "literal",
+      "caseSensitive": true,
+      "sourceIds": [
+        "hatosan"
+      ],
+      "evidence": "term_attested_reading_selected"
+    },
+    {
+      "term": "誰得",
+      "reading": "ダレトク",
+      "category": "japanese_slang",
+      "match": "literal",
+      "caseSensitive": true,
+      "sourceIds": [
+        "quizcastle"
+      ],
+      "evidence": "term_attested_reading_selected"
+    },
+    {
+      "term": "野良",
+      "reading": "ノラ",
+      "category": "japanese_slang",
+      "match": "literal",
+      "caseSensitive": true,
+      "sourceIds": [
+        "hatosan"
+      ],
+      "evidence": "term_attested_reading_selected"
+    },
+    {
+      "term": "❤",
+      "reading": "アカイハート",
+      "category": "reaction_emoji",
+      "match": "literal",
+      "caseSensitive": true,
+      "sourceIds": [
+        "unicode_cldr_ja"
+      ],
+      "evidence": "term_attested_reading_selected"
+    },
+    {
+      "term": "🎉",
+      "reading": "クラッカー",
+      "category": "reaction_emoji",
+      "match": "literal",
+      "caseSensitive": true,
+      "sourceIds": [
+        "unicode_cldr_ja"
+      ],
+      "evidence": "term_attested_reading_selected"
+    },
+    {
+      "term": "👀",
+      "reading": "メ",
+      "category": "reaction_emoji",
+      "match": "literal",
+      "caseSensitive": true,
+      "sourceIds": [
+        "unicode_cldr_ja"
+      ],
+      "evidence": "term_attested_reading_selected"
+    },
+    {
+      "term": "👍",
+      "reading": "サムズアップ",
+      "category": "reaction_emoji",
+      "match": "literal",
+      "caseSensitive": true,
+      "sourceIds": [
+        "unicode_cldr_ja"
+      ],
+      "evidence": "term_attested_reading_selected"
+    },
+    {
+      "term": "👎",
+      "reading": "サムズダウン",
+      "category": "reaction_emoji",
+      "match": "literal",
+      "caseSensitive": true,
+      "sourceIds": [
+        "unicode_cldr_ja"
+      ],
+      "evidence": "term_attested_reading_selected"
+    },
+    {
+      "term": "👏",
+      "reading": "ハクシュ",
+      "category": "reaction_emoji",
+      "match": "literal",
+      "caseSensitive": true,
+      "sourceIds": [
+        "unicode_cldr_ja"
+      ],
+      "evidence": "term_attested_reading_selected"
+    },
+    {
+      "term": "💪",
+      "reading": "チカラコブ",
+      "category": "reaction_emoji",
+      "match": "literal",
+      "caseSensitive": true,
+      "sourceIds": [
+        "unicode_cldr_ja"
+      ],
+      "evidence": "term_attested_reading_selected"
+    },
+    {
+      "term": "😀",
+      "reading": "ニッコリワラウ",
+      "category": "reaction_emoji",
+      "match": "literal",
+      "caseSensitive": true,
+      "sourceIds": [
+        "unicode_cldr_ja"
+      ],
+      "evidence": "term_attested_reading_selected"
+    },
+    {
+      "term": "😂",
+      "reading": "ウレシナキ",
+      "category": "reaction_emoji",
+      "match": "literal",
+      "caseSensitive": true,
+      "sourceIds": [
+        "unicode_cldr_ja"
+      ],
+      "evidence": "term_attested_reading_selected"
+    },
+    {
+      "term": "😄",
+      "reading": "エガオ",
+      "category": "reaction_emoji",
+      "match": "literal",
+      "caseSensitive": true,
+      "sourceIds": [
+        "unicode_cldr_ja"
+      ],
+      "evidence": "term_attested_reading_selected"
+    },
+    {
+      "term": "😅",
+      "reading": "ヒヤアセエガオ",
+      "category": "reaction_emoji",
+      "match": "literal",
+      "caseSensitive": true,
+      "sourceIds": [
+        "unicode_cldr_ja"
+      ],
+      "evidence": "term_attested_reading_selected"
+    },
+    {
+      "term": "😆",
+      "reading": "キャー",
+      "category": "reaction_emoji",
+      "match": "literal",
+      "caseSensitive": true,
+      "sourceIds": [
+        "unicode_cldr_ja"
+      ],
+      "evidence": "term_attested_reading_selected"
+    },
+    {
+      "term": "😉",
+      "reading": "ウインク",
+      "category": "reaction_emoji",
+      "match": "literal",
+      "caseSensitive": true,
+      "sourceIds": [
+        "unicode_cldr_ja"
+      ],
+      "evidence": "term_attested_reading_selected"
+    },
+    {
+      "term": "😊",
+      "reading": "ニコニコ",
+      "category": "reaction_emoji",
+      "match": "literal",
+      "caseSensitive": true,
+      "sourceIds": [
+        "unicode_cldr_ja"
+      ],
+      "evidence": "term_attested_reading_selected"
+    },
+    {
+      "term": "😍",
+      "reading": "メガハートノエガオ",
+      "category": "reaction_emoji",
+      "match": "literal",
+      "caseSensitive": true,
+      "sourceIds": [
+        "unicode_cldr_ja"
+      ],
+      "evidence": "term_attested_reading_selected"
+    },
+    {
+      "term": "😎",
+      "reading": "サングラスデエガオ",
+      "category": "reaction_emoji",
+      "match": "literal",
+      "caseSensitive": true,
+      "sourceIds": [
+        "unicode_cldr_ja"
+      ],
+      "evidence": "term_attested_reading_selected"
+    },
+    {
+      "term": "😘",
+      "reading": "ナゲキッス",
+      "category": "reaction_emoji",
+      "match": "literal",
+      "caseSensitive": true,
+      "sourceIds": [
+        "unicode_cldr_ja"
+      ],
+      "evidence": "term_attested_reading_selected"
+    },
+    {
+      "term": "😡",
+      "reading": "フクレッツラ",
+      "category": "reaction_emoji",
+      "match": "literal",
+      "caseSensitive": true,
+      "sourceIds": [
+        "unicode_cldr_ja"
+      ],
+      "evidence": "term_attested_reading_selected"
+    },
+    {
+      "term": "😢",
+      "reading": "ナキガオ",
+      "category": "reaction_emoji",
+      "match": "literal",
+      "caseSensitive": true,
+      "sourceIds": [
+        "unicode_cldr_ja"
+      ],
+      "evidence": "term_attested_reading_selected"
+    },
+    {
+      "term": "😭",
+      "reading": "オオナキ",
+      "category": "reaction_emoji",
+      "match": "literal",
+      "caseSensitive": true,
+      "sourceIds": [
+        "unicode_cldr_ja"
+      ],
+      "evidence": "term_attested_reading_selected"
+    },
+    {
+      "term": "😱",
+      "reading": "キョウフ",
+      "category": "reaction_emoji",
+      "match": "literal",
+      "caseSensitive": true,
+      "sourceIds": [
+        "unicode_cldr_ja"
+      ],
+      "evidence": "term_attested_reading_selected"
+    },
+    {
+      "term": "🙂",
+      "reading": "ホホエム",
+      "category": "reaction_emoji",
+      "match": "literal",
+      "caseSensitive": true,
+      "sourceIds": [
+        "unicode_cldr_ja"
+      ],
+      "evidence": "term_attested_reading_selected"
+    },
+    {
+      "term": "🙇",
+      "reading": "オジギスルヒト",
+      "category": "reaction_emoji",
+      "match": "literal",
+      "caseSensitive": true,
+      "sourceIds": [
+        "unicode_cldr_ja"
+      ],
+      "evidence": "term_attested_reading_selected"
+    },
+    {
+      "term": "🙏",
+      "reading": "イノリ",
+      "category": "reaction_emoji",
+      "match": "literal",
+      "caseSensitive": true,
+      "sourceIds": [
+        "unicode_cldr_ja"
+      ],
+      "evidence": "term_attested_reading_selected"
+    },
+    {
+      "term": "🤔",
+      "reading": "カンガエルカオ",
+      "category": "reaction_emoji",
+      "match": "literal",
+      "caseSensitive": true,
+      "sourceIds": [
+        "unicode_cldr_ja"
+      ],
+      "evidence": "term_attested_reading_selected"
+    },
+    {
+      "term": "🤗",
+      "reading": "ハグ",
+      "category": "reaction_emoji",
+      "match": "literal",
+      "caseSensitive": true,
+      "sourceIds": [
+        "unicode_cldr_ja"
+      ],
+      "evidence": "term_attested_reading_selected"
+    },
+    {
+      "term": "🤣",
+      "reading": "ワライコロゲル",
+      "category": "reaction_emoji",
+      "match": "literal",
+      "caseSensitive": true,
+      "sourceIds": [
+        "unicode_cldr_ja"
+      ],
+      "evidence": "term_attested_reading_selected"
+    },
+    {
+      "term": "うpろだ",
+      "reading": "アプロダ",
+      "category": "upload_slang",
+      "match": "mixed",
+      "caseSensitive": false,
+      "sourceIds": [
+        "up"
+      ],
+      "evidence": "term_attested_reading_selected"
+    },
+    {
+      "term": "うpロダ",
+      "reading": "アプロダ",
+      "category": "upload_slang",
+      "match": "mixed",
+      "caseSensitive": false,
+      "sourceIds": [
+        "up"
+      ],
+      "evidence": "term_attested_reading_selected"
+    },
+    {
+      "term": "うp主",
+      "reading": "ウプヌシ",
+      "category": "upload_slang",
+      "match": "mixed",
+      "caseSensitive": false,
+      "sourceIds": [
+        "up"
+      ],
+      "evidence": "term_attested_reading_selected"
+    },
+    {
+      "term": "うp",
+      "reading": "ウプ",
+      "category": "upload_slang",
+      "match": "mixed",
+      "caseSensitive": false,
+      "sourceIds": [
+        "up"
+      ],
+      "evidence": "term_attested_reading_selected"
+    }
+  ]
+}
